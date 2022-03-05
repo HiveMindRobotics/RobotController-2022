@@ -15,11 +15,12 @@
 apply from: '../build.common.gradle'
 apply plugin: 'kotlin-android'
 apply from: '../build.dependencies.gradle'
-
 dependencies {
+    implementation 'org.openftc:easyopencv:1.5.1'
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.acmerobotics.roadrunner:core:0.5.5'
 }
 repositories {
     mavenCentral()

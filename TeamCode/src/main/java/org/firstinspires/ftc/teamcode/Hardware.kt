@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.qualcomm.hardware.bosch.BNO055IMU
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator
+import com.qualcomm.hardware.bosch.NaiveAccelerationIntegrator
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 
 class Hardware {
     var motorBL: DcMotor? = null
@@ -12,6 +16,8 @@ class Hardware {
     var motorDucks: DcMotor? = null
     var motorArm: DcMotor? = null
     var servoArm: Servo? = null
+    var webcamName: WebcamName? = null
+    var controlHubIMU: BNO055IMU? = null
 
     fun init(hwMap: HardwareMap) {
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
@@ -21,5 +27,16 @@ class Hardware {
         motorDucks = hwMap.get(DcMotor::class.java, "motor4")
         motorArm = hwMap.get(DcMotor::class.java, "motor5")
         servoArm = hwMap.get(Servo::class.java, "servo0")
+        webcamName = hwMap.get(WebcamName::class.java, "camera0")
+        controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
+
+        val parameters = BNO055IMU.Parameters()
+        parameters.mode                = BNO055IMU.SensorMode.IMU
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC
+        parameters.accelerationIntegrationAlgorithm = JustLoggingAccelerationIntegrator()
+        parameters.loggingEnabled      = false
+        controlHubIMU?.initialize(parameters)
+
     }
 }
