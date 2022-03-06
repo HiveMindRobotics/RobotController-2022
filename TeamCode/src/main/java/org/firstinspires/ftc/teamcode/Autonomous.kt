@@ -3,8 +3,7 @@ package org.firstinspires.ftc.teamcode
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import java.lang.Math.*
-import kotlin.math.pow
+import kotlin.math.*
 
 
 @Autonomous(name = "Autonomous", group = "Linear Opmode")
@@ -21,7 +20,7 @@ class Autonomous : LinearOpMode() {
     override fun runOpMode() {
         waitForStart()
         while (opModeIsActive()) {
-            var velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
+            val velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
             speed = sqrt(velocity.xVeloc.pow(2) + velocity.yVeloc.pow(2) + velocity.zVeloc.pow((2)))
             distance += (speed * time)
             telemetry.addData("distance", distance)

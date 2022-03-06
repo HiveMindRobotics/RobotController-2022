@@ -111,7 +111,7 @@ class ConceptVuforiaFieldNavigationWebcam : LinearOpMode() {
         targets!!.deactivate()
     }
 
-    fun identifyTarget(
+    private fun identifyTarget(
         targetIndex: Int,
         targetName: String?,
         dx: Float,

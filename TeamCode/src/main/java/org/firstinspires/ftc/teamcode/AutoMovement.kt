@@ -1,16 +1,15 @@
 package org.firstinspires.ftc.teamcode
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
+import kotlin.math.*
+import kotlin.system.measureTimeMillis
 
-class AutoMovement(var opMode: Autonomous)  {
+class AutoMovement(private var opMode: Autonomous)  {
     private val robot = opMode.robot
 
     private fun getDistance(): Double {
-        var velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
-        opMode.speed = Math.sqrt(velocity.xVeloc.pow(2) + velocity.yVeloc.pow(2) + velocity.zVeloc.pow((2)))
+        val velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
+        opMode.speed = sqrt(velocity.xVeloc.pow(2) + velocity.yVeloc.pow(2) + velocity.zVeloc.pow((2)))
         opMode.distance += (opMode.speed * opMode.time)
         return opMode.distance
     }
@@ -23,19 +22,6 @@ class AutoMovement(var opMode: Autonomous)  {
         robot.servoArm!!.position = 0.0
     }
 
-    fun armRaise() {
-        robot.motorArm!!.power = -1.0
-        Thread.sleep(1500)
-        armStop()
-
-    }
-
-    fun armLower() {
-        robot.motorArm!!.power = 1.0
-        Thread.sleep(1500)
-        armStop()
-    }
-
     fun ducksStart() {
         robot.motorDucks!!.power = 1.0
     }
@@ -44,22 +30,69 @@ class AutoMovement(var opMode: Autonomous)  {
         robot.motorDucks!!.power = 0.0
     }
 
-    private fun armStop() {
-        robot.motorArm!!.power = 0.0
+    enum class Position {
+        TOP, BOTTOM, MIDDLE
     }
 
-    fun robotDriveForward(speed: Double) {
-        robot.motorBL!!.power = speed
-        robot.motorFL!!.power = speed
-        robot.motorBR!!.power = speed
-        robot.motorFR!!.power = speed
+    fun armRaise(position: Position) {
+        when(position) {
+            Position.TOP -> {
+                robot.motorArm?.power = -1.0
+                while (robot.motorArm?.isBusy == true) {
+                    Thread.sleep(100)
+                }
+                robot.motorArm?.power = 0.0
+            }
+            Position.BOTTOM -> {
+                robot.motorArm?.power = 1.0
+                while (robot.motorArm?.isBusy == true) {
+                    Thread.sleep(100)
+                }
+                robot.motorArm?.power = 0.0
+            }
+            Position.MIDDLE -> {
+                val time = measureTimeMillis {
+                    armRaise(Position.TOP)
+                }
+                armRaise(Position.BOTTOM)
+                robot.motorArm?.power = -1.0
+                Thread.sleep(time / 2)
+                robot.motorArm?.power = 0.0
+            }
+        }
     }
 
-    fun robotDriveBackward(speed: Double) {
-        robot.motorBL!!.power = -speed
-        robot.motorFL!!.power = -speed
-        robot.motorBR!!.power = -speed
-        robot.motorFR!!.power = -speed
+    enum class Direction {
+        FORWARD, BACKWARD, LEFT, RIGHT
+    }
+
+    fun robotTranslate(speed: Double, direction: Direction) {
+        when(direction) {
+            Direction.FORWARD -> {
+                robot.motorBL!!.power = speed
+                robot.motorFL!!.power = speed
+                robot.motorBR!!.power = speed
+                robot.motorFR!!.power = speed
+            }
+            Direction.BACKWARD -> {
+                robot.motorBL!!.power = -speed
+                robot.motorFL!!.power = -speed
+                robot.motorBR!!.power = -speed
+                robot.motorFR!!.power = -speed
+            }
+            Direction.LEFT -> {
+                robot.motorBL!!.power = speed
+                robot.motorFL!!.power = -speed
+                robot.motorBR!!.power = speed
+                robot.motorFR!!.power = -speed
+            }
+            Direction.RIGHT -> {
+                robot.motorBL!!.power = speed
+                robot.motorFL!!.power = speed
+                robot.motorBR!!.power = -speed
+                robot.motorFR!!.power = -speed
+            }
+        }
     }
 
     fun robotRotateLeft(speed: Double) {
@@ -76,20 +109,6 @@ class AutoMovement(var opMode: Autonomous)  {
         robot.motorFR!!.power = -speed
     }
 
-    fun robotTranslateLeft(speed: Double) {
-        robot.motorBL!!.power = speed
-        robot.motorFL!!.power = -speed
-        robot.motorBR!!.power = speed
-        robot.motorFR!!.power = -speed
-    }
-
-    fun robotTranslateRight(speed: Double) {
-        robot.motorBL!!.power = -speed
-        robot.motorFL!!.power = speed
-        robot.motorBR!!.power = -speed
-        robot.motorFR!!.power = speed
-    }
-
     fun robotStop() {
         robot.motorBL!!.power = 0.0
         robot.motorFL!!.power = 0.0
@@ -98,7 +117,7 @@ class AutoMovement(var opMode: Autonomous)  {
     }
 
     fun moveDistance(angle: Double, speed: Double, distance: Double) {
-        var distance0 = opMode.distance
+        val distance0 = opMode.distance
         while ((getDistance() - distance0) < distance) {
             robot.motorBL?.power = -(speed * sin(angle))
             robot.motorFL?.power = -(speed * cos(angle))
@@ -106,5 +125,4 @@ class AutoMovement(var opMode: Autonomous)  {
             robot.motorBR?.power = speed * cos(angle)
         }
     }
-
 }
