@@ -22,8 +22,6 @@ class DriverControl : LinearOpMode() {
         var r: Double
         var robotAngle: Double
         var rightX: Double
-        var armGrabbed = false
-        var armWillGrab: Boolean
 
         waitForStart()
 
