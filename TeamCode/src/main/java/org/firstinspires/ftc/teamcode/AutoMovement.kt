@@ -4,14 +4,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import kotlin.math.*
 import kotlin.system.measureTimeMillis
 
-class AutoMovement(private var opMode: Autonomous)  {
-    private val robot = opMode.robot
+class AutoMovement(private val robot: Hardware)  {
 
-    private fun getDistance(): Double {
-        val velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
-        opMode.speed = sqrt(velocity.xVeloc.pow(2) + velocity.yVeloc.pow(2) + velocity.zVeloc.pow((2)))
-        opMode.distance += (opMode.speed * opMode.time)
-        return opMode.distance
+    inner class AutonomousAutoMovement(private var opMode: Autonomous) {
+        private fun getDistance(): Double {
+            val velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
+            opMode.speed = sqrt(velocity.xVeloc.pow(2) + velocity.yVeloc.pow(2) + velocity.zVeloc.pow((2)))
+            opMode.distance += (opMode.speed * opMode.time)
+            return opMode.distance
+        }
+
+        fun moveDistance(angle: Double, speed: Double, distance: Double) {
+            val distance0 = opMode.distance
+            while ((getDistance() - distance0) < distance) {
+                robot.motorBL?.power = -(speed * sin(angle))
+                robot.motorFL?.power = -(speed * cos(angle))
+                robot.motorFR?.power = speed * sin(angle)
+                robot.motorBR?.power = speed * cos(angle)
+            }
+        }
     }
 
     fun armGrab() {
@@ -114,15 +125,5 @@ class AutoMovement(private var opMode: Autonomous)  {
         robot.motorFL!!.power = 0.0
         robot.motorBR!!.power = 0.0
         robot.motorFR!!.power = 0.0
-    }
-
-    fun moveDistance(angle: Double, speed: Double, distance: Double) {
-        val distance0 = opMode.distance
-        while ((getDistance() - distance0) < distance) {
-            robot.motorBL?.power = -(speed * sin(angle))
-            robot.motorFL?.power = -(speed * cos(angle))
-            robot.motorFR?.power = speed * sin(angle)
-            robot.motorBR?.power = speed * cos(angle)
-        }
     }
 }

@@ -13,18 +13,20 @@ class DriverControl : LinearOpMode() {
     override fun runOpMode() {
         val robot = Hardware()
         robot.init(hardwareMap)
+        val auto = AutoMovement(robot)
 
         robot.controlHubIMU?.startAccelerationIntegration(
             Position(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
             Velocity(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
             250)
 
-        waitForStart()
-
         var r: Double
         var robotAngle: Double
         var rightX: Double
+        var armGrabbed = false
+        var armWillGrab: Boolean
 
+        waitForStart()
 
         while (opModeIsActive()) {
 
@@ -38,8 +40,17 @@ class DriverControl : LinearOpMode() {
 
             robot.motorDucks?.power = -gamepad2.right_stick_x.toDouble()
             robot.motorArm?.power = gamepad2.left_stick_y.toDouble()
-            robot.servoArm?.position = (if (gamepad2.right_trigger > 0) 0.0 else 1.0)
 
+            armWillGrab = gamepad2.right_trigger > 0
+            if (armGrabbed != armWillGrab) {
+                armGrabbed = if (armWillGrab) {
+                    auto.armGrab()
+                    true
+                } else {
+                    auto.armRelease()
+                    false
+                }
+            }
             telemetry.addData("position:", robot.controlHubIMU?.position)
             telemetry.addData("acceleration:", robot.controlHubIMU?.velocity)
             telemetry.addData("direction:", robot.controlHubIMU?.angularOrientation)

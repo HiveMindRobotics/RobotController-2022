@@ -8,14 +8,15 @@ import kotlin.math.*
 
 @Autonomous(name = "Autonomous", group = "Linear Opmode")
 class Autonomous : LinearOpMode() {
-    var autoMovement = AutoMovement(this)
+    var robot = Hardware()
+    var auto = AutoMovement(robot)
+    var autoMovement = auto.AutonomousAutoMovement(this)
     var speed = 0.0
     var distance = 0.0 // a delta distance, don't use standalone
     // var distance1 = distance
     // moveAndStuff()
     // var distance2 = distance
     // var movedDistance = distance2 - distance1
-    var robot = Hardware()
 
     override fun runOpMode() {
         waitForStart()
