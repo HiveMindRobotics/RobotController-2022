@@ -16,7 +16,6 @@ class ConceptVuforiaFieldNavigationWebcam : LinearOpMode() {
     private var lastLocation: OpenGLMatrix? = null
     private var vuforia: VuforiaLocalizer? = null
     private var targets: VuforiaTrackables? = null
-    private var webcamName: WebcamName? = null
     private var targetVisible = false
     override fun runOpMode() {
         val robot = Hardware()
@@ -25,7 +24,7 @@ class ConceptVuforiaFieldNavigationWebcam : LinearOpMode() {
         val parameters = VuforiaLocalizer.Parameters()
         parameters.vuforiaLicenseKey = VUFORIA_KEY
 
-        parameters.cameraName = webcamName
+        parameters.cameraName = robot.webcamName
 
         parameters.useExtendedTracking = false
 
