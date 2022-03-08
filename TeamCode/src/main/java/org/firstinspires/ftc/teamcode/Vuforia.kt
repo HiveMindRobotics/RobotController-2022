@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.*
 import java.util.ArrayList
 
 class Vuforia(private val robot: Hardware, private val opMode: LinearOpMode) {
-    private var lastLocation: OpenGLMatrix? = null
+    var lastLocation: OpenGLMatrix? = null
     private var vuforia: VuforiaLocalizer? = null
     private var targets: VuforiaTrackables? = null
     private var targetVisible = false
@@ -58,48 +58,45 @@ class Vuforia(private val robot: Hardware, private val opMode: LinearOpMode) {
                 cameraLocationOnRobot
             )
         }
+        targets!!.activate()
     }
 
     fun getPosition() {
-        targets!!.activate()
+            targetVisible = false
+            for (trackable in allTrackables!!) {
+                if ((trackable!!.listener as VuforiaTrackableDefaultListener).isVisible) {
+                    opMode.telemetry.addData("Visible Target", trackable.name)
+                    targetVisible = true
 
-        targetVisible = false
-        for (trackable in allTrackables!!) {
-            if ((trackable!!.listener as VuforiaTrackableDefaultListener).isVisible) {
-                opMode.telemetry.addData("Visible Target", trackable.name)
-                targetVisible = true
-
-                val robotLocationTransform =
-                    (trackable.listener as VuforiaTrackableDefaultListener).updatedRobotLocation
-                if (robotLocationTransform != null) {
-                    lastLocation = robotLocationTransform
+                    val robotLocationTransform =
+                        (trackable.listener as VuforiaTrackableDefaultListener).updatedRobotLocation
+                    if (robotLocationTransform != null) {
+                        lastLocation = robotLocationTransform
+                    }
+                    break
                 }
-                break
             }
-        }
 
-        if (targetVisible) {
-            val translation = lastLocation!!.translation
-            opMode.telemetry.addData(
-                "Pos (inches)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                translation[0] / mmPerInch, translation[1] / mmPerInch, translation[2] / mmPerInch
-            )
+            if (targetVisible) {
+                val translation = lastLocation!!.translation
+                opMode.telemetry.addData(
+                    "Pos (inches)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                    translation[0] / mmPerInch, translation[1] / mmPerInch, translation[2] / mmPerInch
+                )
 
-            val rotation =
-                Orientation.getOrientation(lastLocation, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES)
-            opMode.telemetry.addData(
-                "Rot (deg)",
-                "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f",
-                rotation.firstAngle,
-                rotation.secondAngle,
-                rotation.thirdAngle
-            )
-        } else {
-            opMode.telemetry.addData("Visible Target", "none")
-        }
-        opMode.telemetry.update()
-
-        targets!!.deactivate()
+                val rotation =
+                    Orientation.getOrientation(lastLocation, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES)
+                opMode.telemetry.addData(
+                    "Rot (deg)",
+                    "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f",
+                    rotation.firstAngle,
+                    rotation.secondAngle,
+                    rotation.thirdAngle
+                )
+            } else {
+                opMode.telemetry.addData("Visible Target", "none")
+            }
+            opMode.telemetry.update()
     }
 
     private fun identifyTarget(

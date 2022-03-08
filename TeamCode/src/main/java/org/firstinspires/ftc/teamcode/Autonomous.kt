@@ -2,17 +2,15 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import kotlin.math.*
+import kotlinx.coroutines.*
 
 
 @Autonomous(name = "Autonomous", group = "Linear Opmode")
 class Autonomous : LinearOpMode() {
     var robot = Hardware()
     var auto = AutoMovement(robot)
-    var autoMovement = auto.AutonomousAutoMovement(this)
-    var speed = 0.0
-    var distance = 0.0 // a delta distance, don't use standalone
+    var vuforia = Vuforia(robot, this)
+    var autoMovement = auto.AutonomousAutoMovement(vuforia)
     // var distance1 = distance
     // moveAndStuff()
     // var distance2 = distance
@@ -20,12 +18,16 @@ class Autonomous : LinearOpMode() {
 
     override fun runOpMode() {
         waitForStart()
-        while (opModeIsActive()) {
-            val velocity = robot.controlHubIMU!!.velocity.toUnit(DistanceUnit.METER)
-            speed = sqrt(velocity.xVeloc.pow(2) + velocity.yVeloc.pow(2) + velocity.zVeloc.pow((2)))
-            distance += (speed * time)
-            telemetry.addData("distance", distance)
-            telemetry.update()
+        runBlocking {
+            launch {
+                while (opModeIsActive()) {
+                    vuforia.getPosition()
+                }
+            }
+            while (opModeIsActive()) {
+                telemetry.addData("location", vuforia.lastLocation)
+                telemetry.update()
+            }
         }
     }
 }

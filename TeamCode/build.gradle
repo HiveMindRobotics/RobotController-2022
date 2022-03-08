@@ -21,6 +21,7 @@ dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.acmerobotics.roadrunner:core:0.5.5'
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 }
 repositories {
     mavenCentral()
