@@ -17,7 +17,9 @@ class AutoMovement(private val robot: Hardware)  {
         }
 
         fun moveToCoords(x: Double, y: Double, speed: Double) {
-
+            val angle: Double = Math.toDegrees(atan2(x - vuforia.lastLocation!!.translation[0], y - vuforia.lastLocation!!.translation[1]))
+            val distance: Double = hypot(x - vuforia.lastLocation!!.translation[0], y - vuforia.lastLocation!!.translation[1])
+            moveDistance(angle, speed, distance)
         }
     }
 
