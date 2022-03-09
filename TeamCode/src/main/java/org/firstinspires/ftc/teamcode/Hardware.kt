@@ -16,6 +16,7 @@ class Hardware {
     var motorArm: DcMotor? = null
     var servoArm: Servo? = null
     var webcamName: WebcamName? = null
+    var cameraMonitorViewId : Int? = null
     var controlHubIMU: BNO055IMU? = null
 
     fun init(hwMap: HardwareMap) {
@@ -27,6 +28,8 @@ class Hardware {
         motorArm = hwMap.get(DcMotor::class.java, "motor5")
         servoArm = hwMap.get(Servo::class.java, "servo0")
         webcamName = hwMap.get(WebcamName::class.java, "camera0")
+        // TODO: yeet live preview
+        cameraMonitorViewId = hwMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.packageName)
         controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
 
         val parameters = BNO055IMU.Parameters()
