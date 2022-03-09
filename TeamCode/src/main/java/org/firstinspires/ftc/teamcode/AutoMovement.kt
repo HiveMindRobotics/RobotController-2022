@@ -118,19 +118,36 @@ class AutoMovement(private val robot: Hardware)  {
         robot.motorFR!!.power = -speed
     }
 
-    fun robotRotateAngle(speed: Double, angle: Double) {
-        val position0 = robot.controlHubIMU!!.angularOrientation
+    fun robotRotateByAngle(speed: Double, angle: Double) {
+        val position0 = robot.controlHubIMU!!.angularOrientation.thirdAngle
         val speed1 = if (angle > 0) {
             speed
         } else {
             -speed
         }
-        robot.motorFL?.power = -speed1
-        robot.motorBL?.power = -speed1
-        robot.motorFR?.power = speed1
-        robot.motorBR?.power = speed
+        robot.motorFL?.power = speed1
+        robot.motorBL?.power = speed1
+        robot.motorFR?.power = -speed1
+        robot.motorBR?.power = -speed1
         Thread.sleep(100)
-        while (speed.absoluteValue - angle.absoluteValue > 0) {
+        while (robot.controlHubIMU!!.angularOrientation.thirdAngle.absoluteValue - position0.absoluteValue > angle.absoluteValue) {
+            Thread.sleep(100)
+        }
+        robotStop()
+    }
+
+    fun robotRotateToAngle(speed: Double, angle: Double) {
+        val speed1 = if (angle > 0) {
+            speed
+        } else {
+            -speed
+        }
+        robot.motorFL?.power = speed1
+        robot.motorBL?.power = speed1
+        robot.motorFR?.power = -speed1
+        robot.motorBR?.power = -speed1
+        Thread.sleep(100)
+        while (angle.absoluteValue - robot.controlHubIMU!!.angularOrientation.thirdAngle.absoluteValue > 0) {
             Thread.sleep(100)
         }
         robotStop()
