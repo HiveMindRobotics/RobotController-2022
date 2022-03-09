@@ -130,7 +130,7 @@ class AutoMovement(private val robot: Hardware)  {
         robot.motorFR?.power = -speed1
         robot.motorBR?.power = -speed1
         Thread.sleep(100)
-        while (robot.controlHubIMU!!.angularOrientation.thirdAngle.absoluteValue - position0.absoluteValue > angle.absoluteValue) {
+        while (robot.controlHubIMU!!.angularOrientation.thirdAngle.absoluteValue - position0.absoluteValue < angle.absoluteValue) {
             Thread.sleep(100)
         }
         robotStop()
