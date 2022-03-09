@@ -7,8 +7,8 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory
 import org.firstinspires.ftc.robotcore.external.navigation.*
 import java.util.ArrayList
 
-@TeleOp(name = "Vuforia Field Nav Webcam", group = "Concept")
-class ConceptVuforiaFieldNavigationWebcam : LinearOpMode() {
+@TeleOp(name = "Vuforia Test", group = "Concept")
+class VuforiaTest : LinearOpMode() {
     // Class Members
     private var lastLocation: OpenGLMatrix? = null
     private var vuforia: VuforiaLocalizer? = null

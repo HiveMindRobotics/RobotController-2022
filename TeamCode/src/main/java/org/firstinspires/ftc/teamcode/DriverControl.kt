@@ -13,6 +13,7 @@ class DriverControl : LinearOpMode() {
     override fun runOpMode() {
         val robot = Hardware()
         robot.init(hardwareMap)
+        val auto = AutoMovement(robot)
 
         robot.controlHubIMU?.startAccelerationIntegration(
             Position(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
@@ -39,6 +40,10 @@ class DriverControl : LinearOpMode() {
             robot.motorArm?.power = gamepad2.left_stick_y.toDouble()
 
             robot.servoArm?.position = if (gamepad2.right_trigger > 0) 0.0 else 1.0
+
+            if (gamepad1.dpad_right || gamepad1.dpad_left) {
+                auto.robotRotateByAngle(1.0, 90.0)
+            }
 
             telemetry.addData("position:", robot.controlHubIMU?.position)
             telemetry.addData("acceleration:", robot.controlHubIMU?.velocity)

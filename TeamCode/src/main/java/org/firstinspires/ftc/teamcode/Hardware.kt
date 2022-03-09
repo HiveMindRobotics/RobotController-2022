@@ -26,6 +26,7 @@ class Hardware {
         motorFR = hwMap.get(DcMotor::class.java, "motor2")
         motorDucks = hwMap.get(DcMotor::class.java, "motor4")
         motorArm = hwMap.get(DcMotor::class.java, "motor5")
+        motorArm?.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
         servoArm = hwMap.get(Servo::class.java, "servo0")
         webcamName = hwMap.get(WebcamName::class.java, "camera0")
         // TODO: yeet live preview
@@ -39,6 +40,5 @@ class Hardware {
         parameters.accelerationIntegrationAlgorithm = JustLoggingAccelerationIntegrator()
         parameters.loggingEnabled      = false
         controlHubIMU?.initialize(parameters)
-
     }
 }

@@ -8,12 +8,14 @@ class AutoMovement(private val robot: Hardware)  {
     inner class AutonomousAutoMovement(private val vuforia: Vuforia) {
         fun moveDistance(angle: Double, speed: Double, distance: Double) {
             val point0 = vuforia.lastLocation!!.translation
+            robot.motorBL?.power = -(speed * sin(angle))
+            robot.motorFL?.power = -(speed * cos(angle))
+            robot.motorFR?.power = speed * sin(angle)
+            robot.motorBR?.power = speed * cos(angle)
             while (hypot(vuforia.lastLocation!!.translation[0] - point0[0], point0[0] - vuforia.lastLocation!!.translation[1]) < distance) {
-                robot.motorBL?.power = -(speed * sin(angle))
-                robot.motorFL?.power = -(speed * cos(angle))
-                robot.motorFR?.power = speed * sin(angle)
-                robot.motorBR?.power = speed * cos(angle)
+                Thread.sleep(100)
             }
+            robotStop()
         }
 
         fun moveToCoords(x: Double, y: Double, speed: Double) {
@@ -47,14 +49,14 @@ class AutoMovement(private val robot: Hardware)  {
         when(position) {
             Position.TOP -> {
                 robot.motorArm?.power = -1.0
-                while (robot.motorArm?.isBusy == true) {
+                while (robot.motorArm?.isBusy == false) {
                     Thread.sleep(100)
                 }
                 robot.motorArm?.power = 0.0
             }
             Position.BOTTOM -> {
                 robot.motorArm?.power = 1.0
-                while (robot.motorArm?.isBusy == true) {
+                while (robot.motorArm?.isBusy == false) {
                     Thread.sleep(100)
                 }
                 robot.motorArm?.power = 0.0
@@ -107,47 +109,29 @@ class AutoMovement(private val robot: Hardware)  {
     fun robotRotateLeft(speed: Double) {
         robot.motorBL!!.power = -speed
         robot.motorFL!!.power = -speed
-        robot.motorBR!!.power = speed
-        robot.motorFR!!.power = speed
+        robot.motorBR!!.power = -speed
+        robot.motorFR!!.power = -speed
     }
 
     fun robotRotateRight(speed: Double) {
         robot.motorBL!!.power = speed
         robot.motorFL!!.power = speed
-        robot.motorBR!!.power = -speed
-        robot.motorFR!!.power = -speed
+        robot.motorBR!!.power = speed
+        robot.motorFR!!.power = speed
     }
 
     fun robotRotateByAngle(speed: Double, angle: Double) {
-        val position0 = robot.controlHubIMU!!.angularOrientation.thirdAngle
-        val speed1 = if (angle > 0) {
-            speed
-        } else {
-            -speed
-        }
-        robot.motorFL?.power = speed1
-        robot.motorBL?.power = speed1
-        robot.motorFR?.power = -speed1
-        robot.motorBR?.power = -speed1
-        Thread.sleep(100)
-        while (robot.controlHubIMU!!.angularOrientation.thirdAngle.absoluteValue - position0.absoluteValue < angle.absoluteValue) {
-            Thread.sleep(100)
-        }
-        robotStop()
+        robotRotateToAngle(speed, robot.controlHubIMU!!.angularOrientation.firstAngle + angle)
     }
 
     fun robotRotateToAngle(speed: Double, angle: Double) {
-        val speed1 = if (angle > 0) {
-            speed
+        if (angle > 0) {
+            robotRotateRight(speed)
         } else {
-            -speed
+            robotRotateLeft(speed)
         }
-        robot.motorFL?.power = speed1
-        robot.motorBL?.power = speed1
-        robot.motorFR?.power = -speed1
-        robot.motorBR?.power = -speed1
-        Thread.sleep(100)
-        while (angle.absoluteValue - robot.controlHubIMU!!.angularOrientation.thirdAngle.absoluteValue > 0) {
+        Thread.sleep(250)
+        while (angle.absoluteValue - robot.controlHubIMU!!.angularOrientation.firstAngle.absoluteValue > 0) {
             Thread.sleep(100)
         }
         robotStop()
