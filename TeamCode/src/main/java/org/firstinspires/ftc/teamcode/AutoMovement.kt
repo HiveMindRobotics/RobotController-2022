@@ -8,10 +8,12 @@ class AutoMovement(private val robot: Hardware)  {
     inner class AutonomousAutoMovement(private val vuforia: Vuforia) {
         fun moveDistance(angle: Double, speed: Double, distance: Double) {
             val point0 = vuforia.lastLocation!!.translation
-            robot.motorBL?.power = -(speed * sin(angle))
-            robot.motorFL?.power = -(speed * cos(angle))
-            robot.motorFR?.power = speed * sin(angle)
-            robot.motorBR?.power = speed * cos(angle)
+            robotMap(
+                speed * sin(angle),
+                speed * cos(angle),
+                speed * sin(angle),
+                speed * cos(angle)
+            )
             while (hypot(vuforia.lastLocation!!.translation[0] - point0[0], point0[0] - vuforia.lastLocation!!.translation[1]) < distance) {
                 Thread.sleep(100)
             }
@@ -80,44 +82,26 @@ class AutoMovement(private val robot: Hardware)  {
     fun robotTranslate(speed: Double, direction: Direction) {
         when(direction) {
             Direction.FORWARD -> {
-                robot.motorBL!!.power = speed
-                robot.motorFL!!.power = speed
-                robot.motorBR!!.power = speed
-                robot.motorFR!!.power = speed
+                robotMap(speed, speed, speed, speed)
             }
             Direction.BACKWARD -> {
-                robot.motorBL!!.power = -speed
-                robot.motorFL!!.power = -speed
-                robot.motorBR!!.power = -speed
-                robot.motorFR!!.power = -speed
+                robotMap(-speed, -speed, -speed, -speed)
             }
             Direction.LEFT -> {
-                robot.motorBL!!.power = speed
-                robot.motorFL!!.power = -speed
-                robot.motorBR!!.power = speed
-                robot.motorFR!!.power = -speed
+                robotMap(-speed, -speed, speed, speed)
             }
             Direction.RIGHT -> {
-                robot.motorBL!!.power = speed
-                robot.motorFL!!.power = speed
-                robot.motorBR!!.power = -speed
-                robot.motorFR!!.power = -speed
+                robotMap(speed, speed, -speed, -speed)
             }
         }
     }
 
     fun robotRotateLeft(speed: Double) {
-        robot.motorBL!!.power = -speed
-        robot.motorFL!!.power = -speed
-        robot.motorBR!!.power = -speed
-        robot.motorFR!!.power = -speed
+        robotMap(speed, speed, -speed, -speed)
     }
 
     fun robotRotateRight(speed: Double) {
-        robot.motorBL!!.power = speed
-        robot.motorFL!!.power = speed
-        robot.motorBR!!.power = speed
-        robot.motorFR!!.power = speed
+        robotMap(-speed, -speed, speed, speed)
     }
 
     fun robotRotateByAngle(speed: Double, angle: Double) {
@@ -138,9 +122,13 @@ class AutoMovement(private val robot: Hardware)  {
     }
 
     fun robotStop() {
-        robot.motorBL!!.power = 0.0
-        robot.motorFL!!.power = 0.0
-        robot.motorBR!!.power = 0.0
-        robot.motorFR!!.power = 0.0
+        robotMap(0.0,0.0,0.0,0.0)
+    }
+
+    fun robotMap(BL: Double, FL: Double, BR: Double, FR: Double) {
+        robot.motorBL!!.power = -BL
+        robot.motorFL!!.power = -FL
+        robot.motorBR!!.power = BR
+        robot.motorFR!!.power = FR
     }
 }

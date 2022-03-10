@@ -31,10 +31,10 @@ class DriverControl : LinearOpMode() {
             r = hypot(-gamepad1.left_stick_x.toDouble(), gamepad1.left_stick_y.toDouble())
             robotAngle = atan2(gamepad1.left_stick_y.toDouble(), -gamepad1.left_stick_x.toDouble()) - Math.PI / 4
             rightX = gamepad1.right_stick_x.toDouble()
-            robot.motorFL?.power = -(r * cos(robotAngle) - rightX)
             robot.motorBL?.power = -(r * sin(robotAngle) - rightX)
-            robot.motorFR?.power = r * sin(robotAngle) + rightX
+            robot.motorFL?.power = -(r * cos(robotAngle) - rightX)
             robot.motorBR?.power = r * cos(robotAngle) + rightX
+            robot.motorFR?.power = r * sin(robotAngle) + rightX
 
             robot.motorDucks?.power = -gamepad2.right_stick_x.toDouble()
             robot.motorArm?.power = gamepad2.left_stick_y.toDouble()
