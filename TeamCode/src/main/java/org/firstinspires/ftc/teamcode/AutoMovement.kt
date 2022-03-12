@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import kotlin.math.*
 import kotlin.system.measureTimeMillis
 
-class AutoMovement(private val robot: Hardware)  {
+class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode)  {
 
     inner class AutonomousAutoMovement(private val vuforia: Vuforia) {
         fun moveDistance(angle: Double, speed: Double, distance: Double) {
+            vuforia.getPosition()
             val point0 = vuforia.lastLocation!!.translation
             robotMap(
                 speed * sin(angle),
@@ -15,7 +17,7 @@ class AutoMovement(private val robot: Hardware)  {
                 speed * cos(angle)
             )
             while (hypot(vuforia.lastLocation!!.translation[0] - point0[0], point0[0] - vuforia.lastLocation!!.translation[1]) < distance) {
-                Thread.sleep(100)
+                vuforia.getPosition()
             }
             robotStop()
         }
@@ -105,19 +107,27 @@ class AutoMovement(private val robot: Hardware)  {
     }
 
     fun robotRotateByAngle(speed: Double, angle: Double) {
-        robotRotateToAngle(speed, robot.controlHubIMU!!.angularOrientation.firstAngle + angle)
+        robotRotateToAngle(speed, (robot.controlHubIMU!!.angularOrientation.firstAngle + angle) % 360)
     }
 
     fun robotRotateToAngle(speed: Double, angle: Double) {
-        if (angle > 0) {
-            robotRotateRight(speed)
-        } else {
+        if (robot.controlHubIMU!!.angularOrientation.firstAngle - angle < 0) {
             robotRotateLeft(speed)
-        }
-        Thread.sleep(250)
-        while (angle.absoluteValue - robot.controlHubIMU!!.angularOrientation.firstAngle.absoluteValue > 0) {
             Thread.sleep(100)
-        }
+            while (robot.controlHubIMU!!.angularOrientation.firstAngle - angle <= 0) {
+                // compute the meaning of life, do a backflip, etc
+                System.out.println(42.0f)
+                robot.robotFlipper = true
+            }
+        } else {
+            robotRotateRight(speed)
+            Thread.sleep(100)
+            while (robot.controlHubIMU!!.angularOrientation.firstAngle - angle >= 0) {
+                // compute the meaning of life, do a backflip, etc
+                System.out.println(42.0f)
+                robot.robotFlipper = true
+            }
+       }
         robotStop()
     }
 
@@ -126,9 +136,9 @@ class AutoMovement(private val robot: Hardware)  {
     }
 
     fun robotMap(BL: Double, FL: Double, BR: Double, FR: Double) {
-        robot.motorBL!!.power = -BL
-        robot.motorFL!!.power = -FL
-        robot.motorBR!!.power = BR
-        robot.motorFR!!.power = FR
+        robot.motorBL!!.power = BL
+        robot.motorFL!!.power = FL
+        robot.motorBR!!.power = -BR
+        robot.motorFR!!.power = -FR
     }
 }

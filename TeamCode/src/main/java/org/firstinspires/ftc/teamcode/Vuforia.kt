@@ -14,7 +14,6 @@ class Vuforia(private val robot: Hardware, private val opMode: LinearOpMode) {
     private var allTrackables: MutableList<VuforiaTrackable?>? = null
 
     fun init() {
-
         val parameters = VuforiaLocalizer.Parameters()
         parameters.vuforiaLicenseKey = VUFORIA_KEY
 

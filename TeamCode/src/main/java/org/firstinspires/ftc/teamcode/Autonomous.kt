@@ -2,31 +2,32 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import kotlinx.coroutines.*
+import com.qualcomm.robotcore.hardware.DistanceSensor
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 
 @Autonomous(name = "Autonomous", group = "Linear Opmode")
 class Autonomous : LinearOpMode() {
     var robot = Hardware()
-    var auto = AutoMovement(robot)
+    var auto = AutoMovement(robot, this)
     var vuforia = Vuforia(robot, this)
     var autoMovement = auto.AutonomousAutoMovement(vuforia)
-    // var distance1 = distance
-    // moveAndStuff()
-    // var distance2 = distance
-    // var movedDistance = distance2 - distance1
+    var openCV = OpenCV(robot, this)
 
     override fun runOpMode() {
-        waitForStart()
         runBlocking {
+            // TODO(scan ducks)
+            openCV.init()
+            waitForStart()
             launch {
-                while (opModeIsActive()) {
-                    vuforia.getPosition()
-                }
-            }
-            while (opModeIsActive()) {
                 telemetry.addData("location", vuforia.lastLocation)
                 telemetry.update()
+                while (opModeIsActive()) {
+                    // solve world hunger, cure cancer, etc.
+                    robot.cancerCured = true
+                    robot.worldHunger = false
+                }
             }
         }
     }
