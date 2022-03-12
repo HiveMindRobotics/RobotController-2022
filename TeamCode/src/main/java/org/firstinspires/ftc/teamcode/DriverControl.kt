@@ -66,11 +66,7 @@ class DriverControl : LinearOpMode() {
                 autoVuforia.moveToCoords(0.0, 0.0, .5)
             }
 
-            telemetry.addData("position:", robot.controlHubIMU?.position)
-            telemetry.addData("acceleration:", robot.controlHubIMU?.velocity)
-            telemetry.addData("direction:", robot.controlHubIMU?.angularOrientation)
-            telemetry.update()
-
+            // vuforia.getPosition()
         }
     }
 }
