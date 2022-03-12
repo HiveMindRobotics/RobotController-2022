@@ -131,6 +131,7 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
         robotStop()
     }
 
+
     fun robotStop() {
         robotMap(0.0,0.0,0.0,0.0)
     }

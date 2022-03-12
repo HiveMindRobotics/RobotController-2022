@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.hardware.DcMotor
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.robotcore.external.navigation.Position
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity
@@ -30,10 +31,28 @@ class DriverControl : LinearOpMode() {
 
         waitForStart()
 
-        while (opModeIsActive()) {
+        fun nSqrt(v: Double) : Double {
+            return -1 * sqrt(-1 * sqrt(v))
+        }
 
-            r = hypot(-gamepad1.left_stick_x.toDouble(), gamepad1.left_stick_y.toDouble())
-            robotAngle = atan2(gamepad1.left_stick_y.toDouble(), -gamepad1.left_stick_x.toDouble()) - Math.PI / 4
+        var bl: Double
+        var fl: Double
+        var br: Double
+        var fr: Double
+
+        while (opModeIsActive()) {
+            var xLStick = gamepad1.left_stick_x.toDouble()
+            var yLStick = gamepad1.left_stick_y.toDouble()
+            /*xLStick = if(xLStick >= 0)
+                sqrt(xLStick)
+            else
+                -1 * sqrt(-1 * xLStick)
+            yLStick = if(yLStick >= 0)
+                sqrt(xLStick)
+            else
+                -1 * sqrt(-1 * xLStick)*/
+            r = hypot(-xLStick, yLStick)
+            robotAngle = atan2(yLStick, -xLStick) - Math.PI / 4
             rightX = gamepad1.right_stick_x.toDouble()
             bl = r * sin(robotAngle) + rightX
             fl = r * cos(robotAngle) + rightX
