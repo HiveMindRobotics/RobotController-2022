@@ -76,9 +76,9 @@ class DriverControl : LinearOpMode() {
             robot.servoArm?.position = if (gamepad2.right_trigger > 0) 0.0 else 1.0
 
             if (gamepad1.dpad_right) {
-                auto.robotRotateToAngle(.5, 90.0)
+                auto.robotRotateToAngle(.25, 90.0)
             } else if (gamepad1.dpad_left) {
-                auto.robotRotateToAngle(.5, 45.0)
+                auto.robotRotateToAngle(.25, -90.0)
             } else if (gamepad1.dpad_up) {
                 autoVuforia.moveDistance(0.0, .5, 5.0 * 25.4)
             } else if (gamepad1.dpad_down) {

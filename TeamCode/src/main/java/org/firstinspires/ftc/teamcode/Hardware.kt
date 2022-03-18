@@ -16,11 +16,13 @@ class Hardware {
     var webcamName: WebcamName? = null
     var cameraMonitorViewId : Int? = null
     var controlHubIMU: BNO055IMU? = null
+    var expansionHubIMU: BNO055IMU? = null
+    /*
     var distanceSensorFront: DistanceSensor? = null
     var distanceSensorLeft: ColorSensor? = null
     var distanceSensorRight: ColorSensor? = null
     var distanceSensorBack: ColorSensor? = null
-    
+     */
     var robotFlipper: Boolean = false
     var worldHunger: Boolean = true
     var cancerCured: Boolean = false
@@ -35,10 +37,12 @@ class Hardware {
         motorArm?.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
         servoArm = hwMap.get(Servo::class.java, "servo0")
         webcamName = hwMap.get(WebcamName::class.java, "camera0")
+        /*
         distanceSensorFront = hwMap.get(DistanceSensor::class.java, "distance0")
         distanceSensorLeft = hwMap.get(ColorSensor::class.java, "color0")
         distanceSensorRight = hwMap.get(ColorSensor::class.java, "color1")
         distanceSensorBack = hwMap.get(ColorSensor::class.java, "color2")
+        */
         // TODO: yeet live preview
         cameraMonitorViewId = hwMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.packageName)
         controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
