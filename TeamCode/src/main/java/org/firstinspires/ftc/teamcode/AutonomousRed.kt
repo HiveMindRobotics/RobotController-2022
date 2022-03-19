@@ -20,14 +20,14 @@ class AutonomousRed : LinearOpMode() {
         auto.moveToDistance(55.0, 0.2)
         auto.armRelease()
         auto.moveToDistance(25.0, 0.2)
-        auto.ducksStart(1.0)
+        /*auto.ducksStart(1.0)
         auto.robotTranslate(0.4, AutoMovement.Direction.LEFT)
         telemetry.addData("left:", robot.distanceSensorLeft!!.getDistance(DistanceUnit.CM))
         telemetry.update()
         while (robot.distanceSensorLeft!!.getDistance(DistanceUnit.CM) > 7 && !isStopRequested) {
 
         }
-        auto.robotStop()
+        auto.robotStop()*/
         while (!isStopRequested) {
             telemetry.addData("left:", robot.distanceSensorLeft!!.getDistance(DistanceUnit.CM))
             telemetry.update()
