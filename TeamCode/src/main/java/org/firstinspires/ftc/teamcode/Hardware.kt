@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import android.graphics.Color
 import com.qualcomm.hardware.bosch.BNO055IMU
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator
 import com.qualcomm.robotcore.hardware.*
@@ -19,10 +20,9 @@ class Hardware {
     var expansionHubIMU: BNO055IMU? = null
     /*
     var distanceSensorFront: DistanceSensor? = null
-    var distanceSensorLeft: ColorSensor? = null
-    var distanceSensorRight: ColorSensor? = null
-    var distanceSensorBack: ColorSensor? = null
-     */
+    var distanceSensorLeft: ColorRangeSensor? = null
+    var distanceSensorRight: ColorRangeSensor? = null
+    var distanceSensorBack: ColorRangeSensor? = null
     var robotFlipper: Boolean = false
     var worldHunger: Boolean = true
     var cancerCured: Boolean = false
@@ -39,10 +39,9 @@ class Hardware {
         webcamName = hwMap.get(WebcamName::class.java, "camera0")
         /*
         distanceSensorFront = hwMap.get(DistanceSensor::class.java, "distance0")
-        distanceSensorLeft = hwMap.get(ColorSensor::class.java, "color0")
-        distanceSensorRight = hwMap.get(ColorSensor::class.java, "color1")
-        distanceSensorBack = hwMap.get(ColorSensor::class.java, "color2")
-        */
+        distanceSensorLeft = hwMap.get(ColorRangeSensor::class.java, "color0")
+        distanceSensorRight = hwMap.get(ColorRangeSensor::class.java, "color1")
+        distanceSensorBack = hwMap.get(ColorRangeSensor::class.java, "color2")
         // TODO: yeet live preview
         cameraMonitorViewId = hwMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.packageName)
         controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")

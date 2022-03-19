@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import kotlin.math.*
-import kotlin.system.measureTimeMillis
 
 class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode)  {
 
@@ -29,16 +29,38 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
         }
     }
 
-    fun armGrab() {
-        robot.servoArm!!.position = 1.0
+    fun moveToDistance(distance: Double, speed: Double) {
+        var goingBk = getDistance() > distance
+        robotTranslate(speed, if(goingBk) Direction.BACKWARD else Direction.FORWARD)
+        while(opMode.opModeIsActive() &&
+            ((goingBk && getDistance() >= distance) ||
+            (!goingBk && getDistance() <= distance))) {
+            opMode.telemetry.addData("goingBk", goingBk)
+            opMode.telemetry.addData("distance", getDistance())
+            opMode.telemetry.addData("target distance", distance)
+            opMode.telemetry.update()
+            // smoke pipe
+            //                        #%@
+            //                      #%.#
+            //                     #.#
+            //                   .,#
+            // pipe.smoke() ====U
+        }
+        robotStop()
     }
 
-    fun armRelease() {
+    fun getDistance() : Double = round(robot.distanceSensorFront!!.getDistance(DistanceUnit.CM))
+
+    fun armGrab() {
         robot.servoArm!!.position = 0.0
     }
 
-    fun ducksStart() {
-        robot.motorDucks!!.power = 1.0
+    fun armRelease() {
+        robot.servoArm!!.position = 1.0
+    }
+
+    fun ducksStart(speed: Double) {
+        robot.motorDucks!!.power = speed
     }
 
     fun ducksStop() {
@@ -53,26 +75,23 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
         when(position) {
             Position.TOP -> {
                 robot.motorArm?.power = -1.0
-                while (robot.motorArm?.isBusy == false) {
-                    Thread.sleep(100)
-                }
+                    Thread.sleep(1500)
                 robot.motorArm?.power = 0.0
             }
             Position.BOTTOM -> {
                 robot.motorArm?.power = 1.0
-                while (robot.motorArm?.isBusy == false) {
-                    Thread.sleep(100)
-                }
+                Thread.sleep(1500)
                 robot.motorArm?.power = 0.0
             }
             Position.MIDDLE -> {
+                /*
                 val time = measureTimeMillis {
                     armRaise(Position.TOP)
                 }
                 armRaise(Position.BOTTOM)
                 robot.motorArm?.power = -1.0
                 Thread.sleep(time / 2)
-                robot.motorArm?.power = 0.0
+                robot.motorArm?.power = 0.0 */
             }
         }
     }
@@ -90,10 +109,10 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
                 robotMap(-speed, -speed, -speed, -speed)
             }
             Direction.LEFT -> {
-                robotMap(-speed, -speed, speed, speed)
+                robotMap(speed, -speed, -speed, speed)
             }
             Direction.RIGHT -> {
-                robotMap(speed, speed, -speed, -speed)
+                robotMap(-speed, speed, speed, -speed)
             }
         }
     }
@@ -106,31 +125,35 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
         robotMap(-speed, -speed, speed, speed)
     }
 
-    fun robotRotateByAngle(speed: Double, angle: Double) {
-        robotRotateToAngle(speed, (robot.controlHubIMU!!.angularOrientation.firstAngle + angle) % 360)
+    fun rotate90(speed: Double) {
+        var startAngle = angle()
+        robotRotateRight(speed)
+        while(abs(angle() - startAngle) < 90) {
+            // compute the meaning of life, do a backflip, etc.
+            robot.robotFlipper = true
+            println(42.0f)
+        }
     }
 
-    fun robotRotateToAngle(speed: Double, angle: Double) {
-        if (robot.controlHubIMU!!.angularOrientation.firstAngle - angle < 0) {
-            robotRotateLeft(speed)
-            Thread.sleep(100)
-            while (robot.controlHubIMU!!.angularOrientation.firstAngle - angle <= 0) {
-                // compute the meaning of life, do a backflip, etc
-                System.out.println(42.0f)
-                robot.robotFlipper = true
-            }
-        } else {
-            robotRotateRight(speed)
-            Thread.sleep(100)
-            while (robot.controlHubIMU!!.angularOrientation.firstAngle - angle >= 0) {
-                // compute the meaning of life, do a backflip, etc
-                System.out.println(42.0f)
-                robot.robotFlipper = true
-            }
-       }
-        robotStop()
+    fun rotateR90(speed: Double) {
+        var startAngle = angle()
+        robotRotateLeft(speed)
+        while(abs(angle() - startAngle) < 90) {
+            // compute the meaning of life, do a backflip, etc.
+            robot.robotFlipper = true
+            println(42.0f)
+        }
     }
 
+    private fun avg(x: Float, y: Float): Float {
+        return (x + y) / 2
+    }
+
+    fun avgAngles(): Float {
+        return avg(-robot.controlHubIMU!!.angularOrientation.firstAngle, robot.expansionHubIMU!!.angularOrientation.firstAngle)
+    }
+
+    fun angle(): Float = robot.controlHubIMU!!.angularOrientation.firstAngle + 180
 
     fun robotStop() {
         robotMap(0.0,0.0,0.0,0.0)

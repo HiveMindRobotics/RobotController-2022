@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import com.qualcomm.robotcore.hardware.DcMotor
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.robotcore.external.navigation.Position
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity
@@ -15,10 +14,6 @@ class DriverControl : LinearOpMode() {
         val robot = Hardware()
         robot.init(hardwareMap)
         val auto = AutoMovement(robot, this)
-        val vuforia = Vuforia(robot, this)
-        val autoVuforia = auto.AutonomousAutoMovement(vuforia)
-
-        vuforia.init()
 
         robot.controlHubIMU?.startAccelerationIntegration(
             Position(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
@@ -73,19 +68,25 @@ class DriverControl : LinearOpMode() {
             robot.motorDucks?.power = -gamepad2.right_stick_x.toDouble()
             robot.motorArm?.power = gamepad2.left_stick_y.toDouble()
 
-            robot.servoArm?.position = if (gamepad2.right_trigger > 0) 0.0 else 1.0
+            robot.servoArm?.position = if (gamepad2.right_trigger > 0) 1.0 else 0.0
 
+            /*
             if (gamepad1.dpad_right) {
-                auto.robotRotateToAngle(.25, 90.0)
+                auto.robotTranslate(0.2, AutoMovement.Direction.RIGHT)
             } else if (gamepad1.dpad_left) {
-                auto.robotRotateToAngle(.25, -90.0)
+                auto.robotTranslate(0.2, AutoMovement.Direction.LEFT)
             } else if (gamepad1.dpad_up) {
-                autoVuforia.moveDistance(0.0, .5, 5.0 * 25.4)
+                auto.robotTranslate(0.2, AutoMovement.Direction.FORWARD)
             } else if (gamepad1.dpad_down) {
-                autoVuforia.moveToCoords(0.0, 0.0, .5)
-            }
-
-            // vuforia.getPosition()
+                auto.robotTranslate(0.2, AutoMovement.Direction.BACKWARD)
+            } */
+/*
+            telemetry.addData("angle:", robot.controlHubIMU!!.angularOrientation.firstAngle)
+            telemetry.addData("angle2", robot.controlHubIMU!!.angularOrientation.secondAngle)
+            telemetry.addData("angle3", robot.controlHubIMU!!.angularOrientation.thirdAngle)
+            telemetry.addData("front:", auto.getDistance())
+            telemetry.update() */
+            //vuforia.getPosition()
         }
     }
 }
