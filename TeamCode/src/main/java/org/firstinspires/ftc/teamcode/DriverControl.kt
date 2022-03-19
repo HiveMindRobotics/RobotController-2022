@@ -50,10 +50,7 @@ class DriverControl : LinearOpMode() {
                     sqrt(yLStick)
             r = hypot(-xLStick, yLStick)
             robotAngle = atan2(yLStick, -xLStick) - Math.PI / 4
-            rightX = if(gamepad1.right_stick_x.toDouble() < 0)
-                        -sqrt(-gamepad1.right_stick_x.toDouble())
-                     else
-                         sqrt(gamepad1.right_stick_x.toDouble())
+            rightX = 0.5 * gamepad1.right_stick_x.toDouble()
             bl = r * sin(robotAngle) + rightX
             fl = r * cos(robotAngle) + rightX
             br = -(r * cos(robotAngle) - rightX)

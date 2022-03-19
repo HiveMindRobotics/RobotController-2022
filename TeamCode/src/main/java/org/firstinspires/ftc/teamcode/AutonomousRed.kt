@@ -17,7 +17,7 @@ class AutonomousRed : LinearOpMode() {
         waitForStart()
 
         auto.armRaise(AutoMovement.Position.TOP)
-        auto.moveToDistance(55.0, 0.2)
+        auto.moveToDistance(30.0, 0.2)
         auto.armRelease()
         auto.moveToDistance(25.0, 0.2)
         /*auto.ducksStart(1.0)
@@ -28,6 +28,7 @@ class AutonomousRed : LinearOpMode() {
 
         }
         auto.robotStop()*/
+        auto.robotTranslate(0.4, AutoMovement.Direction.RIGHT)
         while (!isStopRequested) {
             telemetry.addData("left:", robot.distanceSensorLeft!!.getDistance(DistanceUnit.CM))
             telemetry.update()
