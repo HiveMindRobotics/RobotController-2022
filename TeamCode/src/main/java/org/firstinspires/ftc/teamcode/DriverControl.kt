@@ -36,19 +36,24 @@ class DriverControl : LinearOpMode() {
         var fr: Double
 
         while (opModeIsActive()) {
-            var xLStick = gamepad1.left_stick_x.toDouble()
-            var yLStick = gamepad1.left_stick_y.toDouble()
-            /*xLStick = if(xLStick >= 0)
-                sqrt(xLStick)
-            else
-                -1 * sqrt(-1 * xLStick)
-            yLStick = if(yLStick >= 0)
-                sqrt(xLStick)
-            else
-                -1 * sqrt(-1 * xLStick)*/
+            var xLStick = -gamepad1.left_stick_x.toDouble()
+            var yLStick = -gamepad1.left_stick_y.toDouble()
+            xLStick =
+                if(xLStick < 0)
+                    -sqrt(-xLStick)
+                else
+                    sqrt(xLStick)
+            yLStick =
+                if(yLStick < 0)
+                    -sqrt(-yLStick)
+                else
+                    sqrt(yLStick)
             r = hypot(-xLStick, yLStick)
             robotAngle = atan2(yLStick, -xLStick) - Math.PI / 4
-            rightX = gamepad1.right_stick_x.toDouble()
+            rightX = if(gamepad1.right_stick_x.toDouble() < 0)
+                        -sqrt(-gamepad1.right_stick_x.toDouble())
+                     else
+                         sqrt(gamepad1.right_stick_x.toDouble())
             bl = r * sin(robotAngle) + rightX
             fl = r * cos(robotAngle) + rightX
             br = -(r * cos(robotAngle) - rightX)
