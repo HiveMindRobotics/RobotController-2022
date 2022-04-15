@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.robotcore.external.navigation.Position
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity
+import java.time.Duration
 import kotlin.math.*
+import kotlin.time.Duration.Companion.milliseconds
 
 @TeleOp(name = "Driver Control", group = "Linear Opmode")
 class DriverControl : LinearOpMode() {
@@ -23,6 +25,8 @@ class DriverControl : LinearOpMode() {
         var r: Double
         var robotAngle: Double
         var rightX: Double
+        var scaleFactor: Double = 1.0
+        var lastPress = System.currentTimeMillis()
 
         waitForStart()
 
@@ -57,11 +61,22 @@ class DriverControl : LinearOpMode() {
             fr = -(r * sin(robotAngle) - rightX)
 
             var arr = mapOf(
-                Pair(robot.motorBL!!, bl),
-                Pair(robot.motorFL!!, fl),
-                Pair(robot.motorBR!!, br),
-                Pair(robot.motorFR!!, fr)
+                Pair(robot.motorBL!!, bl * scaleFactor),
+                Pair(robot.motorFL!!, fl * scaleFactor),
+                Pair(robot.motorBR!!, br * scaleFactor),
+                Pair(robot.motorFR!!, fr * scaleFactor)
             )
+
+            if (gamepad1.dpad_up && scaleFactor <= 1 && System.currentTimeMillis() - lastPress > 500) {
+                scaleFactor += 0.1
+                lastPress = System.currentTimeMillis()
+            } else if (gamepad1.dpad_down && scaleFactor >= 0 && System.currentTimeMillis() - lastPress > 500) {
+                scaleFactor -= 0.1
+                lastPress = System.currentTimeMillis()
+            }
+
+            telemetry.addData("scaleFactor", scaleFactor)
+            telemetry.update()
 
             for(i in arr) {
                 i.key.power = i.value
