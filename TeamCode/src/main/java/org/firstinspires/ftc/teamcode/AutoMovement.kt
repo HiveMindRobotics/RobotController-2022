@@ -30,7 +30,7 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
     }
 
     fun moveToDistance(distance: Double, speed: Double) {
-        var goingBk = getDistance() > distance
+        val goingBk = getDistance() > distance
         robotTranslate(speed, if(goingBk) Direction.BACKWARD else Direction.FORWARD)
         while(opMode.opModeIsActive() &&
             ((goingBk && getDistance() >= distance) ||
@@ -39,32 +39,26 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
             opMode.telemetry.addData("distance", getDistance())
             opMode.telemetry.addData("target distance", distance)
             opMode.telemetry.update()
-            // smoke pipe
-            //                        #%@
-            //                      #%.#
-            //                     #.#
-            //                   .,#
-            // pipe.smoke() ====U
         }
         robotStop()
     }
 
-    fun getDistance() : Double = round(robot.distanceSensorFront!!.getDistance(DistanceUnit.CM))
+    fun getDistance() : Double = round(robot.distanceSensorFront.getDistance(DistanceUnit.CM))
 
     fun armGrab() {
-        robot.servoArm!!.position = 0.0
+        robot.servoArm.position = 0.0
     }
 
     fun armRelease() {
-        robot.servoArm!!.position = 1.0
+        robot.servoArm.position = 1.0
     }
 
     fun ducksStart(speed: Double) {
-        robot.motorDucks!!.power = speed
+        robot.motorDucks.power = speed
     }
 
     fun ducksStop() {
-        robot.motorDucks!!.power = 0.0
+        robot.motorDucks.power = 0.0
     }
 
     enum class Position {
@@ -74,14 +68,14 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
     fun armRaise(position: Position) {
         when(position) {
             Position.TOP -> {
-                robot.motorArm?.power = -1.0
+                robot.motorArm.power = -1.0
                     Thread.sleep(1500)
-                robot.motorArm?.power = 0.0
+                robot.motorArm.power = 0.0
             }
             Position.BOTTOM -> {
-                robot.motorArm?.power = 1.0
+                robot.motorArm.power = 1.0
                 Thread.sleep(1500)
-                robot.motorArm?.power = 0.0
+                robot.motorArm.power = 0.0
             }
             Position.MIDDLE -> {
                 /*
@@ -126,21 +120,19 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
     }
 
     fun rotate90(speed: Double) {
-        var startAngle = angle()
+        val startAngle = angle()
         robotRotateRight(speed)
         while(abs(angle() - startAngle) < 90) {
             // compute the meaning of life, do a backflip, etc.
-            robot.robotFlipper = true
             println(42.0f)
         }
     }
 
     fun rotateR90(speed: Double) {
-        var startAngle = angle()
+        val startAngle = angle()
         robotRotateLeft(speed)
         while(abs(angle() - startAngle) < 90) {
             // compute the meaning of life, do a backflip, etc.
-            robot.robotFlipper = true
             println(42.0f)
         }
     }
@@ -150,19 +142,19 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
     }
 
     fun avgAngles(): Float {
-        return avg(-robot.controlHubIMU!!.angularOrientation.firstAngle, robot.expansionHubIMU!!.angularOrientation.firstAngle)
+        return avg(-robot.controlHubIMU.angularOrientation.firstAngle, robot.expansionHubIMU.angularOrientation.firstAngle)
     }
 
-    fun angle(): Float = robot.controlHubIMU!!.angularOrientation.firstAngle + 180
+    fun angle(): Float = robot.controlHubIMU.angularOrientation.firstAngle + 180
 
     fun robotStop() {
         robotMap(0.0,0.0,0.0,0.0)
     }
 
     fun robotMap(BL: Double, FL: Double, BR: Double, FR: Double) {
-        robot.motorBL!!.power = BL
-        robot.motorFL!!.power = FL
-        robot.motorBR!!.power = -BR
-        robot.motorFR!!.power = -FR
+        robot.motorBL.power = BL
+        robot.motorFL.power = FL
+        robot.motorBR.power = -BR
+        robot.motorFR.power = -FR
     }
 }

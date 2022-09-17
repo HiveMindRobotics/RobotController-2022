@@ -10,7 +10,9 @@ import org.openftc.easyopencv.OpenCvPipeline
 
 
 class OpenCV(private val robot: Hardware, private val opMode: LinearOpMode) {
-    val camera: OpenCvCamera = OpenCvCameraFactory.getInstance().createWebcam(robot.webcamName, robot.cameraMonitorViewId!!)
+    val camera: OpenCvCamera = OpenCvCameraFactory.getInstance().createWebcam(robot.webcamName,
+        robot.cameraMonitorViewId
+    )
     val barcodePosition: Int? = null
 
     fun init() {

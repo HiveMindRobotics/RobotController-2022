@@ -9,7 +9,7 @@ import kotlin.concurrent.thread
 
 @Autonomous(name = "Autonomous Blue", group = "Linear Opmode")
 class AutonomousBlue : LinearOpMode() {
-    var robot = Hardware()
+    var robot = Hardware(hardwareMap)
     var auto = AutoMovement(robot, this)
 
     override fun runOpMode() {
@@ -25,7 +25,6 @@ class AutonomousBlue : LinearOpMode() {
         auto.armRelease()
         auto.moveToDistance(5.0, 0.2)
         */
-        robot.init(hardwareMap)
         auto.armGrab()
 
         waitForStart()

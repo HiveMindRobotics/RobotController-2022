@@ -8,12 +8,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 
 @Autonomous(name = "Autonomous Red", group = "Linear Opmode")
 class AutonomousRed : LinearOpMode() {
-    var robot = Hardware()
+    var robot = Hardware(hardwareMap)
     var auto = AutoMovement(robot, this)
 
     override fun runOpMode() {
 
-        robot.init(hardwareMap)
         auto.armGrab()
 
         waitForStart()

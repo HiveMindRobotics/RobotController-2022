@@ -13,11 +13,10 @@ import kotlin.time.Duration.Companion.milliseconds
 class DriverControl : LinearOpMode() {
 
     override fun runOpMode() {
-        val robot = Hardware()
-        robot.init(hardwareMap)
+        val robot = Hardware(hardwareMap)
         val auto = AutoMovement(robot, this)
 
-        robot.controlHubIMU?.startAccelerationIntegration(
+        robot.controlHubIMU.startAccelerationIntegration(
             Position(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
             Velocity(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
             250)
@@ -60,11 +59,11 @@ class DriverControl : LinearOpMode() {
             br = -(r * cos(robotAngle) - rightX)
             fr = -(r * sin(robotAngle) - rightX)
 
-            var arr = mapOf(
-                Pair(robot.motorBL!!, bl * scaleFactor),
-                Pair(robot.motorFL!!, fl * scaleFactor),
-                Pair(robot.motorBR!!, br * scaleFactor),
-                Pair(robot.motorFR!!, fr * scaleFactor)
+            val arr = mapOf(
+                Pair(robot.motorBL, bl * scaleFactor),
+                Pair(robot.motorFL, fl * scaleFactor),
+                Pair(robot.motorBR, br * scaleFactor),
+                Pair(robot.motorFR, fr * scaleFactor)
             )
 
             if (gamepad1.dpad_up && scaleFactor <= 1 && System.currentTimeMillis() - lastPress > 500) {
@@ -82,10 +81,10 @@ class DriverControl : LinearOpMode() {
                 i.key.power = i.value
             }
 
-            robot.motorDucks?.power = -gamepad2.right_stick_x.toDouble()
-            robot.motorArm?.power = gamepad2.left_stick_y.toDouble()
+            robot.motorDucks.power = -gamepad2.right_stick_x.toDouble()
+            robot.motorArm.power = gamepad2.left_stick_y.toDouble()
 
-            robot.servoArm?.position = if (gamepad2.right_trigger > 0) 1.0 else 0.0
+            robot.servoArm.position = if (gamepad2.right_trigger > 0) 1.0 else 0.0
 
             /*
             if (gamepad1.dpad_right) {
