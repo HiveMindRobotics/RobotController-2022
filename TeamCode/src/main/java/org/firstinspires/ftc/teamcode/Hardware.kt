@@ -10,8 +10,8 @@ import kotlin.properties.Delegates
 
 class Hardware(hwMap: HardwareMap?) {
     // add "lateinit" whenever you need to comment something out
-    lateinit var motorBL: DcMotor
-    lateinit var motorBR: DcMotor
+    var motorBL: DcMotor
+    var motorBR: DcMotor
     lateinit var motorFL: DcMotor
     lateinit var motorFR: DcMotor
 
@@ -23,15 +23,17 @@ class Hardware(hwMap: HardwareMap?) {
     lateinit var distanceSensorFront: DistanceSensor
 
     var cameraMonitorViewId by Delegates.notNull<Int>()
-    lateinit var webcamName: WebcamName
     var openCvCamera: OpenCvCamera
+    var webcamName: WebcamName
 
     lateinit var controlHubIMU: BNO055IMU
     lateinit var expansionHubIMU: BNO055IMU
 
     init {
-/*        motorBL = hwMap.get(DcMotor::class.java, "motor0")
+        hwMap!!
+        motorBL = hwMap.get(DcMotor::class.java, "motor0")
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
+        /*
         motorFL = hwMap.get(DcMotor::class.java, "motor3")
         motorFR = hwMap.get(DcMotor::class.java, "motor2")
 
@@ -53,8 +55,10 @@ class Hardware(hwMap: HardwareMap?) {
         )!!*/
 
         // TODO: switch to external camera
-        openCvCamera = OpenCvCameraFactory.getInstance()
-            .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK)
+/*        openCvCamera = OpenCvCameraFactory.getInstance()
+            .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK)*/
+        webcamName = hwMap.get(WebcamName::class.java, "camera0")
+        openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName)
 /*
         controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu1")
         expansionHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")

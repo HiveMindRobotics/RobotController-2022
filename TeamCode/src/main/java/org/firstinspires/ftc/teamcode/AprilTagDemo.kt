@@ -20,9 +20,9 @@ class AprilTagDemo : LinearOpMode() {
     // 0.98 inches
     var tagsize = 0.0249
 
-    val hardware = Hardware(hardwareMap)
-
     override fun runOpMode() {
+        val hardware = Hardware(hardwareMap)
+
         val camera = hardware.openCvCamera
 
         val aprilTagDetectionPipeline = AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy)

@@ -14,12 +14,14 @@ class DriverControl : LinearOpMode() {
 
     override fun runOpMode() {
         val robot = Hardware(hardwareMap)
+/*
         val auto = AutoMovement(robot, this)
+*/
 
-        robot.controlHubIMU.startAccelerationIntegration(
+/*        robot.controlHubIMU.startAccelerationIntegration(
             Position(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
             Velocity(DistanceUnit.MM, 0.0, 0.0, 0.0, 0),
-            250)
+            250)*/
 
         var r: Double
         var robotAngle: Double
@@ -39,7 +41,21 @@ class DriverControl : LinearOpMode() {
         var fr: Double
 
         while (opModeIsActive()) {
-            var xLStick = -gamepad1.left_stick_x.toDouble()
+            if (gamepad1.left_trigger > 0) {
+                robot.motorBL.power = gamepad1.left_trigger.toDouble()
+            } else if (gamepad1.left_bumper) {
+                robot.motorBL.power = -0.5
+            } else {
+                robot.motorBL.power = 0.0
+            }
+            if (gamepad1.right_trigger > 0) {
+                robot.motorBR.power = -gamepad1.right_trigger.toDouble()
+            } else if (gamepad1.right_bumper) {
+                robot.motorBR.power = 0.5
+            } else {
+                robot.motorBR.power = 0.0
+            }
+/*            var xLStick = -gamepad1.left_stick_x.toDouble()
             var yLStick = -gamepad1.left_stick_y.toDouble()
             xLStick =
                 if(xLStick < 0)
@@ -84,7 +100,7 @@ class DriverControl : LinearOpMode() {
             robot.motorDucks.power = -gamepad2.right_stick_x.toDouble()
             robot.motorArm.power = gamepad2.left_stick_y.toDouble()
 
-            robot.servoArm.position = if (gamepad2.right_trigger > 0) 1.0 else 0.0
+            robot.servoArm.position = if (gamepad2.right_trigger > 0) 1.0 else 0.0*/
 
             /*
             if (gamepad1.dpad_right) {
