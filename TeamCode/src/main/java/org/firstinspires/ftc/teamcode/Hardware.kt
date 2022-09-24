@@ -33,6 +33,8 @@ class Hardware(hwMap: HardwareMap?) {
         hwMap!!
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
+        motorBL.direction = DcMotorSimple.Direction.REVERSE
+
         /*
         motorFL = hwMap.get(DcMotor::class.java, "motor3")
         motorFR = hwMap.get(DcMotor::class.java, "motor2")
