@@ -55,7 +55,7 @@ class DriverControl : LinearOpMode() {
                 -gamepad1.right_trigger.toDouble()
             }
 
-            // Cycle through easing functions
+            //DEBUG: Cycle through easing functions
             val easeVals = enumValues<EaseMode>()
             easeMode = when {
                 gamepad1.right_bumper -> easeVals[Math.floorMod((easeMode.ordinal + 1), easeVals.size)]
@@ -63,7 +63,7 @@ class DriverControl : LinearOpMode() {
                 else -> easeMode
             }
 
-            // Log movement
+            //DEBUG: Log movement
             telemetry.addLine("easeMode: $easeMode")
             telemetry.addLine("Motor Position: ${robot.motorLinearSlide.currentPosition}")
             telemetry.update()
