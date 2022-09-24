@@ -6,7 +6,7 @@ import kotlin.math.*
 
 @TeleOp(name = "Driver Control", group = "Linear Opmode")
 class DriverControl : LinearOpMode() {
-    var easeMode: EaseMode = EaseMode.EXP
+    private var easeMode: EaseMode = EaseMode.EXP
 
     companion object {
         const val DEADZONE = 0.5
