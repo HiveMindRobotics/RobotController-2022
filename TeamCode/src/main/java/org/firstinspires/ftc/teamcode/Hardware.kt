@@ -15,6 +15,8 @@ class Hardware(hwMap: HardwareMap?) {
     lateinit var motorFL: DcMotor
     lateinit var motorFR: DcMotor
 
+    var motorLinearSlide: DcMotorEx
+
     lateinit var motorDucks: DcMotor
 
     lateinit var motorArm: DcMotor
@@ -34,6 +36,8 @@ class Hardware(hwMap: HardwareMap?) {
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
         motorBL.direction = DcMotorSimple.Direction.REVERSE
+
+        motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
 
         /*
         motorFL = hwMap.get(DcMotor::class.java, "motor3")
