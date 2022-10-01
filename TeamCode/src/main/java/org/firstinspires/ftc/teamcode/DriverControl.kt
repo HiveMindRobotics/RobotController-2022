@@ -20,12 +20,15 @@ class DriverControl : LinearOpMode() {
         }
     }
 
+    private var odometry = Odometry()
+
     override fun runOpMode() {
         val robot = Hardware(hardwareMap)
 
         waitForStart()
 
         while (opModeIsActive()) {
+
             // Forwards / Backwards
             if (abs(gamepad1.right_stick_y) > DEADZONE) {
                 val speed = gamepad1.right_stick_y.toDouble() * MAXSPEED
@@ -63,9 +66,18 @@ class DriverControl : LinearOpMode() {
                 else -> easeMode
             }
 
+            odometry.update(
+                robot.motorBL.currentPosition,
+                robot.motorBR.currentPosition,
+                robot.controlHubIMU.angularOrientation.firstAngle
+            );
+
             //DEBUG: Log movement
             telemetry.addLine("easeMode: $easeMode")
-            telemetry.addLine("Motor Position: ${robot.motorLinearSlide.currentPosition}")
+            telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() / (28 * 3)}")
+            telemetry.addLine("Motor Position (BR): ${robot.motorBR.currentPosition.toFloat() / (28 * 3)}")
+            telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
+            telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
             telemetry.update()
         }
     }
