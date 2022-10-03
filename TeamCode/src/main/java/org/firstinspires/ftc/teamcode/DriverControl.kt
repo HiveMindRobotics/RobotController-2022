@@ -10,13 +10,14 @@ class DriverControl : LinearOpMode() {
 
     companion object {
         const val DEADZONE = 0.5
-        const val MAXSPEED = 0.8
+        const val MAXSPEED = 1.0
     }
 
     private fun easeFun(x: Double, mode: EaseMode): Double {
         return when (mode) {
             EaseMode.SQRT -> sqrt(x * sign(x)) * sign(x)
             EaseMode.EXP -> x.pow(2) * sign(x)
+            EaseMode.NONE -> x
         }
     }
 
