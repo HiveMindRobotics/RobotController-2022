@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import kotlin.math.*
+
 
 @TeleOp(name = "Driver Control", group = "Linear Opmode")
 class DriverControl : LinearOpMode() {
@@ -30,6 +31,9 @@ class DriverControl : LinearOpMode() {
         waitForStart()
 
         while (opModeIsActive()) {
+            for (hub in robot.allHubs) {
+                hub.clearBulkCache()
+            }
 
             // Forwards / Backwards
             if (abs(gamepad1.right_stick_y) > DEADZONE) {

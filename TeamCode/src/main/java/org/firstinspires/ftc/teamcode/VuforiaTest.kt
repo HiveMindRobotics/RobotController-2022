@@ -17,6 +17,10 @@ class VuforiaTest : LinearOpMode() {
     override fun runOpMode() {
         val robot = Hardware(hardwareMap)
 
+        for (hub in robot.allHubs) {
+            hub.clearBulkCache()
+        }
+
         val parameters = VuforiaLocalizer.Parameters()
         parameters.vuforiaLicenseKey = VUFORIA_KEY
 

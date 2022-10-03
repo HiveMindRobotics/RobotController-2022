@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.hardware.bosch.BNO055IMU
+import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.hardware.*
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
-import org.openftc.easyopencv.OpenCvInternalCamera
 import kotlin.properties.Delegates
 
 class Hardware(hwMap: HardwareMap?) {
@@ -31,6 +31,8 @@ class Hardware(hwMap: HardwareMap?) {
     var controlHubIMU: BNO055IMU
     lateinit var expansionHubIMU: BNO055IMU
 
+    var allHubs: List<LynxModule>
+
     init {
         hwMap!!
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
@@ -38,6 +40,13 @@ class Hardware(hwMap: HardwareMap?) {
         motorBL.direction = DcMotorSimple.Direction.REVERSE
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
+
+        allHubs = hwMap.getAll(LynxModule::class.java)
+
+        // WARNING!!!! you MUST reset the cache after every cycle!!!!!!!!!
+        for (hub in allHubs) {
+            hub.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL
+        }
 
         /*
         motorFL = hwMap.get(DcMotor::class.java, "motor3")
