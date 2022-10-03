@@ -24,6 +24,7 @@ class DriverControl : LinearOpMode() {
     private var odometry = Odometry()
 
     override fun runOpMode() {
+        // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
 
         waitForStart()
