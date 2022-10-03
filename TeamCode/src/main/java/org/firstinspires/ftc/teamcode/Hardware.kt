@@ -28,7 +28,7 @@ class Hardware(hwMap: HardwareMap?) {
     var openCvCamera: OpenCvCamera
     var webcamName: WebcamName
 
-    lateinit var controlHubIMU: BNO055IMU
+    var controlHubIMU: BNO055IMU
     lateinit var expansionHubIMU: BNO055IMU
 
     init {
@@ -60,13 +60,16 @@ class Hardware(hwMap: HardwareMap?) {
             hwMap.appContext?.packageName
         )!!*/
 
-        // TODO: switch to external camera
 /*        openCvCamera = OpenCvCameraFactory.getInstance()
             .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK)*/
         webcamName = hwMap.get(WebcamName::class.java, "camera0")
         openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName)
+
+        controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
+        val imuParams = BNO055IMU.Parameters();
+        imuParams.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        controlHubIMU.initialize(imuParams);
 /*
-        controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu1")
         expansionHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
 
         val parameters = BNO055IMU.Parameters()
