@@ -67,7 +67,7 @@ class Hardware(hwMap: HardwareMap?) {
 
         controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
         val imuParams = BNO055IMU.Parameters();
-        imuParams.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imuParams.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         controlHubIMU.initialize(imuParams);
 /*
         expansionHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
