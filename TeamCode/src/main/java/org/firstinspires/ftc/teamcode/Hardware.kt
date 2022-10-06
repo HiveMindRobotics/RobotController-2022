@@ -36,6 +36,7 @@ class Hardware(hwMap: HardwareMap?) {
     init {
         hwMap!!
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
+
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
         motorBL.direction = DcMotorSimple.Direction.REVERSE
 
@@ -75,9 +76,9 @@ class Hardware(hwMap: HardwareMap?) {
         openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName)
 
         controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
-        val imuParams = BNO055IMU.Parameters();
-        imuParams.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        controlHubIMU.initialize(imuParams);
+        val imuParams = BNO055IMU.Parameters()
+        imuParams.angleUnit = BNO055IMU.AngleUnit.RADIANS
+        controlHubIMU.initialize(imuParams)
 /*
         expansionHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
 

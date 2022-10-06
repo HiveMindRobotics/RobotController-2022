@@ -22,11 +22,11 @@ class DriverControl : LinearOpMode() {
         }
     }
 
-    private var odometry = Odometry()
-
     override fun runOpMode() {
         // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
+        // odometry should init here so it's reset every time
+        val odometry = Odometry()
 
         waitForStart()
 
@@ -76,12 +76,12 @@ class DriverControl : LinearOpMode() {
                 robot.motorBL.currentPosition,
                 robot.motorBR.currentPosition,
                 robot.controlHubIMU.angularOrientation.firstAngle
-            );
+            )
 
             //DEBUG: Log movement
             telemetry.addLine("easeMode: $easeMode")
-            telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() / (28 * 3)}")
-            telemetry.addLine("Motor Position (BR): ${robot.motorBR.currentPosition.toFloat() / (28 * 3)}")
+            telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+            telemetry.addLine("Motor Position (BR): ${robot.motorBR.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
             telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
             telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
             telemetry.update()
