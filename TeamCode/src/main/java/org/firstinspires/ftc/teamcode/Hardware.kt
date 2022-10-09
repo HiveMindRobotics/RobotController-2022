@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.hardware.bosch.BNO055IMU
+import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.hardware.*
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
-import org.openftc.easyopencv.OpenCvInternalCamera
 import kotlin.properties.Delegates
 
 class Hardware(hwMap: HardwareMap?) {
@@ -28,16 +28,26 @@ class Hardware(hwMap: HardwareMap?) {
     var openCvCamera: OpenCvCamera
     var webcamName: WebcamName
 
-    lateinit var controlHubIMU: BNO055IMU
+    var controlHubIMU: BNO055IMU
     lateinit var expansionHubIMU: BNO055IMU
+
+    var allHubs: List<LynxModule>
 
     init {
         hwMap!!
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
+
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
         motorBL.direction = DcMotorSimple.Direction.REVERSE
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
+
+        allHubs = hwMap.getAll(LynxModule::class.java)
+
+        // WARNING!!!! you MUST reset the cache after every cycle!!!!!!!!!
+        for (hub in allHubs) {
+            hub.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL
+        }
 
         /*
         motorFL = hwMap.get(DcMotor::class.java, "motor3")
@@ -60,13 +70,16 @@ class Hardware(hwMap: HardwareMap?) {
             hwMap.appContext?.packageName
         )!!*/
 
-        // TODO: switch to external camera
 /*        openCvCamera = OpenCvCameraFactory.getInstance()
             .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK)*/
         webcamName = hwMap.get(WebcamName::class.java, "camera0")
         openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName)
+
+        controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
+        val imuParams = BNO055IMU.Parameters()
+        imuParams.angleUnit = BNO055IMU.AngleUnit.RADIANS
+        controlHubIMU.initialize(imuParams)
 /*
-        controlHubIMU = hwMap.get(BNO055IMU::class.java, "imu1")
         expansionHubIMU = hwMap.get(BNO055IMU::class.java, "imu0")
 
         val parameters = BNO055IMU.Parameters()

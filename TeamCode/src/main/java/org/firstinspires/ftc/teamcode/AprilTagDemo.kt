@@ -45,6 +45,10 @@ class AprilTagDemo : LinearOpMode() {
         telemetry.msTransmissionInterval = 50
 
         while (opModeIsActive()) {
+            for (hub in hardware.allHubs) {
+                hub.clearBulkCache()
+            }
+
             // Calling getDetectionsUpdate() will only return an object if there was a new frame
             // processed since the last time we called it. Otherwise, it will return null. This
             // enables us to only run logic when there has been a new frame, as opposed to the

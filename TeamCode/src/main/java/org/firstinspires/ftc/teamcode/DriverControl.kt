@@ -21,15 +21,23 @@ class DriverControl : LinearOpMode() {
             EaseMode.EXP -> x.pow(2) * sign(x)
             // Looks weird, but it feels really nice while driving. Magic numbers calculated with a calculator
             EaseMode.LOG -> if(x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
+            EaseMode.NONE -> x
         }
     }
 
     override fun runOpMode() {
+        // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
+        // odometry should init here so it's reset every time
+        val odometry = Odometry()
 
         waitForStart()
 
         while (opModeIsActive()) {
+            for (hub in robot.allHubs) {
+                hub.clearBulkCache()
+            }
+
             // Forwards / Backwards
 
             // Joystick mode
@@ -91,9 +99,19 @@ class DriverControl : LinearOpMode() {
                 else -> easeMode
             }*/
 
+            odometry.update(
+                robot.motorBL.currentPosition,
+                robot.motorBR.currentPosition,
+                robot.controlHubIMU.angularOrientation.firstAngle
+            )
+
             //DEBUG: Log movement
             telemetry.addLine("easeMode: $easeMode")
-            telemetry.addLine("Motor Position: ${robot.motorLinearSlide.currentPosition}")
+            telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+            telemetry.addLine("Motor Position (BR): ${robot.motorBR.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+            telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
+            telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
+            telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
             telemetry.addLine("left stick: ${gamepad1.left_stick_x}")
             telemetry.addLine("Ltrigger, Rtrigger = ${gamepad1.left_trigger}, ${gamepad1.right_trigger}")
             telemetry.update()
