@@ -62,25 +62,14 @@ class DriverControl : LinearOpMode() {
                 robot.motorBR.power = 0.0
             }
 
-            // Turning
-            if(-gamepad1.left_trigger + gamepad1.right_trigger != 0.0f) {
-                // Already moving, modify that
-                if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                    val speed = gamepad1.left_stick_x.toDouble() * MAXTURNSPEED
-                    robot.motorBL.power -= easeFun(speed, EaseMode.EXP) // EXP works best for turning while moving
-                    robot.motorBR.power -= easeFun(-speed, EaseMode.EXP)
-                }
-            } else {
-                // Not already moving, spin normally
-                if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                    val speed = gamepad1.left_stick_x.toDouble() * MAXTURNSPEED
-                    robot.motorBL.power = easeFun(-speed, EaseMode.EXP) // SQRT works best for turning while moving
-                    robot.motorBR.power = easeFun(speed, EaseMode.EXP)
-                }
-                else {
-                    robot.motorBL.power = 0.0
-                    robot.motorBR.power = 0.0
-                }
+            if (abs(gamepad1.left_stick_x) > DEADZONE) {
+                val speed = gamepad1.left_stick_x.toDouble() * MAXTURNSPEED
+                robot.motorBL.power = easeFun(-speed, EaseMode.EXP) // SQRT works best for turning while moving
+                robot.motorBR.power = easeFun(speed, EaseMode.EXP)
+            }
+            else {
+                robot.motorBL.power = 0.0
+                robot.motorBR.power = 0.0
             }
 
             // Linear slide motor
