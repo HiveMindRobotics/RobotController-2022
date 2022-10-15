@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.*
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.milliseconds
@@ -29,6 +30,10 @@ class DriverControl : LinearOpMode() {
         // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
         val odometry = Odometry()
+
+        var prevGamepad1 = Gamepad()
+        var prevGamepad2 = Gamepad()
+
 
         waitForStart()
 
@@ -64,11 +69,27 @@ class DriverControl : LinearOpMode() {
                 // Sensitivity clutch with B
                 targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
 
+                // Snap turning with D-Pad
+                if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                    robot.motorBL.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
+                    robot.motorBR.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
+                } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
+                    robot.motorBL.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                    robot.motorBR.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
+                    robot.motorBL.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                    robot.motorBR.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                }
+
                 odometry.update(
                     robot.motorBL.currentPosition,
                     robot.motorBR.currentPosition,
                     robot.controlHubIMU.angularOrientation.firstAngle
                 )
+
+                // Update previous gamepad state
+                prevGamepad1.copy(gamepad1)
+                prevGamepad2.copy(gamepad2)
 
                 //DEBUG: Log movement
                 telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
