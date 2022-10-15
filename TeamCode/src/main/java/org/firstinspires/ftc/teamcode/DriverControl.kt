@@ -11,8 +11,8 @@ class DriverControl : LinearOpMode() {
     private var easeMode: EaseMode = EaseMode.LOG
     companion object {
         const val DEADZONE = 0.1
-        const val MAXSPEED = 1
-        const val MAXTURNSPEED = 1 // Want more precise turning but faster forwards/backwards movement
+        const val MAXSPEED = 1.0
+        const val MAXTURNSPEED = 1.0 // Want more precise turning but faster forwards/backwards movement
         // 1 is temporary - just to test
     }
 
@@ -29,10 +29,12 @@ class DriverControl : LinearOpMode() {
     override fun runOpMode() {
         // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
-        // odometry should init here so it's reset every time
         val odometry = Odometry()
 
         waitForStart()
+
+        var targetTurnSpeed = MAXTURNSPEED
+        var clutch = false
 
         while (opModeIsActive()) {
             val elapsed = measureTimeMillis {
@@ -40,42 +42,30 @@ class DriverControl : LinearOpMode() {
                     hub.clearBulkCache()
                 }
 
-                // Forwards / Backwards
-
-                // Joystick mode
-                /* if (abs(gamepad1.right_stick_y) > DEADZONE) {
-                val speed = gamepad1.right_stick_y.toDouble() * MAXSPEED
+            // Drive with triggers
+            val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
+            if (abs(power) > DEADZONE) {
+                val speed = power.toDouble() * MAXSPEED
                 robot.motorBL.power = easeFun(speed, easeMode)
                 robot.motorBR.power = easeFun(speed, easeMode)
-            }
-            else {
+            } else {
                 robot.motorBL.power = 0.0
                 robot.motorBR.power = 0.0
-            } */
+            }
 
-                // Trigger mode
-                val power = -gamepad1.left_trigger + gamepad1.right_trigger // Gives a "braking" effect"
-                if (abs(power) > DEADZONE) {
-                    val speed = power.toDouble() * MAXSPEED
-                    robot.motorBL.power = easeFun(speed, easeMode)
-                    robot.motorBR.power = easeFun(speed, easeMode)
-                } else {
-                    robot.motorBL.power = 0.0
-                    robot.motorBR.power = 0.0
-                }
+            if (abs(gamepad1.left_stick_x) > DEADZONE) {
+                val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
+                robot.motorBL.power -= easeFun(speed, EaseMode.EXP) // SQRT works best for turning while moving
+                robot.motorBR.power -= easeFun(-speed, EaseMode.EXP)
+            }
 
-                if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                    val speed = gamepad1.left_stick_x.toDouble() * MAXTURNSPEED
-                    robot.motorBL.power -= easeFun(speed, EaseMode.EXP) // SQRT works best for turning while moving
-                    robot.motorBR.power -= easeFun(-speed, EaseMode.EXP)
-                }
+            // Per Ben H's request, turn with bumpers
+            if (gamepad1.left_bumper) robot.motorBL.power = targetTurnSpeed / 2
+            if (gamepad1.right_bumper) robot.motorBR.power = targetTurnSpeed / 2
 
-                // Linear slide motor
-                robot.motorLinearSlide.power = if (gamepad1.left_trigger.toDouble() > 0) {
-                    gamepad1.left_trigger.toDouble()
-                } else {
-                    -gamepad1.right_trigger.toDouble()
-                }
+            // Sensitivity clutch with B
+            if (gamepad1.b) clutch = !clutch
+            targetTurnSpeed = if (clutch) MAXTURNSPEED / 2 else MAXTURNSPEED
 
                 // Commented out because it seems we don't need this anymore?
                 //DEBUG: Cycle through easing functions
