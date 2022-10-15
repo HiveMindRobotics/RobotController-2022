@@ -20,7 +20,7 @@ class DriverControl : LinearOpMode() {
             EaseMode.SQRT -> sqrt(x * sign(x)) * sign(x)
             EaseMode.EXP -> x.pow(2) * sign(x)
             // Looks weird, but it feels really nice while driving. Magic numbers calculated with a calculator
-            EaseMode.LOG -> if(x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
+            EaseMode.LOG -> if (x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
             EaseMode.NONE -> x
         }
     }
@@ -40,29 +40,29 @@ class DriverControl : LinearOpMode() {
                     hub.clearBulkCache()
                 }
 
-            // Drive with triggers
-            val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
-            if (abs(power) > DEADZONE) {
-                val speed = power.toDouble() * MAXSPEED
-                robot.motorBL.power = easeFun(speed, EaseMode.LOG)
-                robot.motorBR.power = easeFun(speed, EaseMode.LOG)
-            } else {
-                robot.motorBL.power = 0.0
-                robot.motorBR.power = 0.0
-            }
+                // Drive with triggers
+                val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
+                if (abs(power) > DEADZONE) {
+                    val speed = power.toDouble() * MAXSPEED
+                    robot.motorBL.power = easeFun(speed, EaseMode.LOG)
+                    robot.motorBR.power = easeFun(speed, EaseMode.LOG)
+                } else {
+                    robot.motorBL.power = 0.0
+                    robot.motorBR.power = 0.0
+                }
 
-            if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
-                robot.motorBL.power -= easeFun(speed, EaseMode.LOG) // SQRT works best for turning while moving
-                robot.motorBR.power -= easeFun(-speed, EaseMode.LOG)
-            }
+                if (abs(gamepad1.left_stick_x) > DEADZONE) {
+                    val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
+                    robot.motorBL.power -= easeFun(speed, EaseMode.LOG) // SQRT works best for turning while moving
+                    robot.motorBR.power -= easeFun(-speed, EaseMode.LOG)
+                }
 
-            // Per Ben H's request, turn with bumpers
-            if (gamepad1.left_bumper) robot.motorBL.power = targetTurnSpeed / 2
-            if (gamepad1.right_bumper) robot.motorBR.power = targetTurnSpeed / 2
+                // Per Ben H's request, turn with bumpers
+                if (gamepad1.left_bumper) robot.motorBL.power = targetTurnSpeed / 2
+                if (gamepad1.right_bumper) robot.motorBR.power = targetTurnSpeed / 2
 
-            // Sensitivity clutch with B
-            targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
+                // Sensitivity clutch with B
+                targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
 
                 odometry.update(
                     robot.motorBL.currentPosition,
