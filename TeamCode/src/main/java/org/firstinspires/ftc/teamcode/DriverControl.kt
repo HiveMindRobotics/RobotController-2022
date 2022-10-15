@@ -8,7 +8,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @TeleOp(name = "Driver Control", group = "Linear Opmode")
 class DriverControl : LinearOpMode() {
-    private var easeMode: EaseMode = EaseMode.LOG
     companion object {
         const val DEADZONE = 0.1
         const val MAXSPEED = 1.0
@@ -46,8 +45,8 @@ class DriverControl : LinearOpMode() {
             val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
             if (abs(power) > DEADZONE) {
                 val speed = power.toDouble() * MAXSPEED
-                robot.motorBL.power = easeFun(speed, easeMode)
-                robot.motorBR.power = easeFun(speed, easeMode)
+                robot.motorBL.power = easeFun(speed, EaseMode.LOG)
+                robot.motorBR.power = easeFun(speed, EaseMode.LOG)
             } else {
                 robot.motorBL.power = 0.0
                 robot.motorBR.power = 0.0
@@ -55,8 +54,8 @@ class DriverControl : LinearOpMode() {
 
             if (abs(gamepad1.left_stick_x) > DEADZONE) {
                 val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
-                robot.motorBL.power -= easeFun(speed, EaseMode.EXP) // SQRT works best for turning while moving
-                robot.motorBR.power -= easeFun(-speed, EaseMode.EXP)
+                robot.motorBL.power -= easeFun(speed, EaseMode.LOG) // SQRT works best for turning while moving
+                robot.motorBR.power -= easeFun(-speed, EaseMode.LOG)
             }
 
             // Per Ben H's request, turn with bumpers
@@ -83,7 +82,6 @@ class DriverControl : LinearOpMode() {
                 )
 
                 //DEBUG: Log movement
-                telemetry.addLine("easeMode: $easeMode")
                 telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
                 telemetry.addLine("Motor Position (BR): ${robot.motorBR.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
                 telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
