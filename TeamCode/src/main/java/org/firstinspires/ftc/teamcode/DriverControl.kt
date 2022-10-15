@@ -33,7 +33,6 @@ class DriverControl : LinearOpMode() {
         waitForStart()
 
         var targetTurnSpeed = MAXTURNSPEED
-        var clutch = false
 
         while (opModeIsActive()) {
             val elapsed = measureTimeMillis {
