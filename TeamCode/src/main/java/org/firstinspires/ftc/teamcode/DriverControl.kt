@@ -63,8 +63,7 @@ class DriverControl : LinearOpMode() {
             if (gamepad1.right_bumper) robot.motorBR.power = targetTurnSpeed / 2
 
             // Sensitivity clutch with B
-            if (gamepad1.b) clutch = !clutch
-            targetTurnSpeed = if (clutch) MAXTURNSPEED / 2 else MAXTURNSPEED
+            targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
 
                 // Commented out because it seems we don't need this anymore?
                 //DEBUG: Cycle through easing functions
