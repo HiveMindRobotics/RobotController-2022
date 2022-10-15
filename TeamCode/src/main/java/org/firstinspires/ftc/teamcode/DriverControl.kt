@@ -64,15 +64,6 @@ class DriverControl : LinearOpMode() {
             // Sensitivity clutch with B
             targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
 
-                // Commented out because it seems we don't need this anymore?
-                //DEBUG: Cycle through easing functions
-                /*val easeVals = enumValues<EaseMode>()
-            easeMode = when {
-                gamepad1.right_bumper -> easeVals[Math.floorMod((easeMode.ordinal + 1), easeVals.size)]
-                gamepad1.left_bumper -> easeVals[Math.floorMod((easeMode.ordinal - 1), easeVals.size)]
-                else -> easeMode
-            }*/
-
                 odometry.update(
                     robot.motorBL.currentPosition,
                     robot.motorBR.currentPosition,
