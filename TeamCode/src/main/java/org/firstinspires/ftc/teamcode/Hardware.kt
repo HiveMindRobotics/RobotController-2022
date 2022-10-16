@@ -36,9 +36,15 @@ class Hardware(hwMap: HardwareMap?) {
     init {
         hwMap!!
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
+        motorBL.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        motorBL.targetPosition = 0
+        motorBL.mode = DcMotor.RunMode.RUN_TO_POSITION
+        motorBL.direction = DcMotorSimple.Direction.REVERSE
 
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
-        motorBL.direction = DcMotorSimple.Direction.REVERSE
+        motorBR.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        motorBR.targetPosition = 0
+        motorBR.mode = DcMotor.RunMode.RUN_TO_POSITION
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
         servoArm = hwMap.get(Servo::class.java, "servo0")
