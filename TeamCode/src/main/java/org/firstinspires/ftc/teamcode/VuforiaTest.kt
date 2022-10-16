@@ -30,15 +30,15 @@ class VuforiaTest : LinearOpMode() {
 
         vuforia = ClassFactory.getInstance().createVuforia(parameters)
 
-        targets = vuforia!!.loadTrackablesFromAsset("FreightFrenzy")
+        targets = vuforia!!.loadTrackablesFromAsset("PowerPlay")
 
         val allTrackables: MutableList<VuforiaTrackable?> = ArrayList()
         allTrackables.addAll(targets!!)
 
-        identifyTarget(0, "Blue Storage", -halfField, oneAndHalfTile, mmTargetHeight, 90f, 0f, 90f)
-        identifyTarget(1, "Blue Alliance Wall", halfTile, halfField, mmTargetHeight, 90f, 0f, 0f)
-        identifyTarget(2, "Red Storage", -halfField, -oneAndHalfTile, mmTargetHeight, 90f, 0f, 90f)
-        identifyTarget(3, "Red Alliance Wall", halfTile, -halfField, mmTargetHeight, 90f, 0f, 180f)
+        identifyTarget(0, "Blue Rear Wall", -halfField, oneAndHalfTile, mmTargetHeight, 90f, 0f, 90f)
+        identifyTarget(1, "Blue Audience Wall", halfTile, halfField, mmTargetHeight, 90f, 0f, 0f)
+        identifyTarget(2, "Red Rear Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90f, 0f, 90f)
+        identifyTarget(3, "Red Audience Wall", halfTile, -halfField, mmTargetHeight, 90f, 0f, 180f)
 
         val CAMERA_FORWARD_DISPLACEMENT =
             6.25f * mmPerInch
