@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.*
 import kotlin.system.measureTimeMillis
@@ -31,8 +32,10 @@ class DriverControl : LinearOpMode() {
         val robot = Hardware(hardwareMap)
         val odometry = Odometry()
 
-        var prevGamepad1 = Gamepad()
-        var prevGamepad2 = Gamepad()
+        val prevGamepad1 = Gamepad()
+        val prevGamepad2 = Gamepad()
+
+        var state = DriverControlState.Normal
 
 
         waitForStart()
@@ -41,55 +44,85 @@ class DriverControl : LinearOpMode() {
 
         while (opModeIsActive()) {
             val elapsed = measureTimeMillis {
+
                 for (hub in robot.allHubs) {
                     hub.clearBulkCache()
                 }
 
-                // Drive with triggers
-                val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
-                if (abs(power) > DEADZONE) {
-                    val speed = power.toDouble() * MAXSPEED
-                    robot.motorBL.power = easeFun(speed, EaseMode.LOG)
-                    robot.motorBR.power = easeFun(speed, EaseMode.LOG)
-                } else {
-                    robot.motorBL.power = 0.0
-                    robot.motorBR.power = 0.0
+                when (state) {
+                    DriverControlState.Normal -> {
+                        robot.motorBL.mode = DcMotor.RunMode.RUN_USING_ENCODER
+                        robot.motorBR.mode = DcMotor.RunMode.RUN_USING_ENCODER
+
+                        // Sensitivity clutch with B
+                        targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
+
+                        // Drive with triggers
+                        val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
+                        if (abs(power) > DEADZONE) {
+                            val speed = power.toDouble() * MAXSPEED
+                            robot.motorBL.power = easeFun(speed, EaseMode.LOG)
+                            robot.motorBR.power = easeFun(speed, EaseMode.LOG)
+                        } else {
+                            robot.motorBL.power = 0.0
+                            robot.motorBR.power = 0.0
+                        }
+
+                        if (abs(gamepad1.left_stick_x) > DEADZONE) {
+                            val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
+                            robot.motorBL.power -= easeFun(
+                                speed,
+                                EaseMode.LOG
+                            ) // SQRT works best for turning while moving
+                            robot.motorBR.power -= easeFun(-speed, EaseMode.LOG)
+                        }
+
+                        // Per Ben H's request, turn with bumpers
+                        if (gamepad1.left_bumper) robot.motorBL.power = targetTurnSpeed / 2
+                        if (gamepad1.right_bumper) robot.motorBR.power = targetTurnSpeed / 2
+
+                        // Snap turning with D-Pad
+                        if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                            robot.motorBL.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.motorBR.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.motorBL.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
+                            robot.motorBR.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
+                            state = DriverControlState.SnapTurning
+                        } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
+                            robot.motorBL.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.motorBR.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.motorBL.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                            robot.motorBR.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                            state = DriverControlState.SnapTurning
+                        } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
+                            robot.motorBL.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.motorBR.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.motorBL.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                            robot.motorBR.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                            state = DriverControlState.SnapTurning
+                        }
+                    }
+
+                    DriverControlState.SnapTurning -> {
+                        if (!robot.motorBL.isBusy && !robot.motorBR.isBusy) {
+                            state = DriverControlState.Normal
+                        } else if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                            robot.motorBL.targetPosition = robot.motorBL.currentPosition
+                            robot.motorBR.targetPosition = robot.motorBL.currentPosition
+                            state = DriverControlState.Normal
+                        }
+                    }
                 }
 
-                if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                    val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
-                    robot.motorBL.power -= easeFun(speed, EaseMode.LOG) // SQRT works best for turning while moving
-                    robot.motorBR.power -= easeFun(-speed, EaseMode.LOG)
-                }
-
-                // Per Ben H's request, turn with bumpers
-                if (gamepad1.left_bumper) robot.motorBL.power = targetTurnSpeed / 2
-                if (gamepad1.right_bumper) robot.motorBR.power = targetTurnSpeed / 2
-
-                // Sensitivity clutch with B
-                targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
-
-                // Snap turning with D-Pad
-                if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
-                    robot.motorBL.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
-                    robot.motorBR.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
-                } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
-                    robot.motorBL.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
-                    robot.motorBR.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
-                } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
-                    robot.motorBL.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
-                    robot.motorBR.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
-                }
+                // Update previous gamepad state
+                prevGamepad1.copy(gamepad1)
+                prevGamepad2.copy(gamepad2)
 
                 odometry.update(
                     robot.motorBL.currentPosition,
                     robot.motorBR.currentPosition,
                     robot.controlHubIMU.angularOrientation.firstAngle
                 )
-
-                // Update previous gamepad state
-                prevGamepad1.copy(gamepad1)
-                prevGamepad2.copy(gamepad2)
 
                 //DEBUG: Log movement
                 telemetry.addLine("Motor Position (BL): ${robot.motorBL.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")

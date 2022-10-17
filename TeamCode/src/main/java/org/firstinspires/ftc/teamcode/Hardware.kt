@@ -8,7 +8,7 @@ import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
 import kotlin.properties.Delegates
 
-class Hardware(hwMap: HardwareMap?) {
+class Hardware(hwMap: HardwareMap) {
     // add "lateinit" whenever you need to comment something out
     var motorBL: DcMotor
     var motorBR: DcMotor
@@ -34,17 +34,14 @@ class Hardware(hwMap: HardwareMap?) {
     var allHubs: List<LynxModule>
 
     init {
-        hwMap!!
         motorBL = hwMap.get(DcMotor::class.java, "motor0")
         motorBL.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        motorBL.targetPosition = 0
-        motorBL.mode = DcMotor.RunMode.RUN_TO_POSITION
+        motorBL.mode = DcMotor.RunMode.RUN_USING_ENCODER
         motorBL.direction = DcMotorSimple.Direction.REVERSE
 
         motorBR = hwMap.get(DcMotor::class.java, "motor1")
         motorBR.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        motorBR.targetPosition = 0
-        motorBR.mode = DcMotor.RunMode.RUN_TO_POSITION
+        motorBR.mode = DcMotor.RunMode.RUN_USING_ENCODER
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
         servoArm = hwMap.get(Servo::class.java, "servo0")

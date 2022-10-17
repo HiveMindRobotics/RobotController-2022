@@ -9,10 +9,6 @@ class Odometry {
     var x: Float = 0.0f
     var y: Float = 0.0f
 
-    var firstLoop = true
-    var baseR = 0
-    var baseL = 0
-
     var prevX = 0
     var prevHeading: Float = 0.0f;
 
@@ -28,14 +24,9 @@ class Odometry {
     // https://gm0.org/en/latest/docs/software/concepts/odometry.html#robot-relative-deltas
     // TODO: switch to pose exponentials
     fun update(xL: Int, xR: Int, heading: Float) {
-        if (firstLoop) {
-            firstLoop = false
-            baseL = xL
-            baseR = xR
-        }
 
         // get relative position of the center (average)
-        val relPos = ((xL - baseL) + (xR - baseR)) / 2
+        val relPos = (xL + xR) / 2
         val deltaPos = relPos - prevX
 
         // use a rotation matrix, but only do the first bit since we only have Xc
