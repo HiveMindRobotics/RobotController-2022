@@ -2,100 +2,129 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.*
+import kotlin.system.measureTimeMillis
 
 @TeleOp(name = "Driver Control", group = "Linear Opmode")
 class DriverControl : LinearOpMode() {
-    private var easeMode: EaseMode = EaseMode.LOG
-
     companion object {
         const val DEADZONE = 0.1
-        const val MAXSPEED = 1
-        const val MAXTURNSPEED = 1 // Want more precise turning but faster forwards/backwards movement
+        const val MAXSPEED = 1.0
+        const val MAXTURNSPEED = 1.0 // Want more precise turning but faster forwards/backwards movement
         // 1 is temporary - just to test
     }
 
-    private fun easeFun(x: Double, mode: EaseMode): Double {
-        return when (mode) {
-            EaseMode.SQRT -> sqrt(x * sign(x)) * sign(x)
-            EaseMode.EXP -> x.pow(2) * sign(x)
-            // Looks weird, but it feels really nice while driving. Magic numbers calculated with a calculator
-            EaseMode.LOG -> if(x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
-        }
-    }
+    private fun easeFun(x: Double): Double =
+        if (x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
 
     override fun runOpMode() {
+        // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
+        val odometry = Odometry()
+
+        val prevGamepad1 = Gamepad()
+        val prevGamepad2 = Gamepad()
+
+        var state = DriverControlState.Normal
+
 
         waitForStart()
 
+        var targetTurnSpeed: Double
+
         while (opModeIsActive()) {
-            // Forwards / Backwards
+            val elapsed = measureTimeMillis {
 
-            // Joystick mode
-            /* if (abs(gamepad1.right_stick_y) > DEADZONE) {
-                val speed = gamepad1.right_stick_y.toDouble() * MAXSPEED
-                robot.motorBL.power = easeFun(speed, easeMode)
-                robot.motorBR.power = easeFun(speed, easeMode)
-            }
-            else {
-                robot.motorBL.power = 0.0
-                robot.motorBR.power = 0.0
-            } */
-
-            // Trigger mode
-            val power = -gamepad1.left_trigger + gamepad1.right_trigger // Gives a "braking" effect"
-            if (abs(power) > DEADZONE) {
-                val speed = power.toDouble() * MAXSPEED
-                robot.motorBL.power = easeFun(speed, easeMode)
-                robot.motorBR.power = easeFun(speed, easeMode)
-            } else {
-                robot.motorBL.power = 0.0
-                robot.motorBR.power = 0.0
-            }
-
-            // Turning
-            if(-gamepad1.left_trigger + gamepad1.right_trigger != 0.0f) {
-                // Already moving, modify that
-                if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                    val speed = gamepad1.left_stick_x.toDouble() * MAXTURNSPEED
-                    robot.motorBL.power -= easeFun(speed, EaseMode.EXP) // EXP works best for turning while moving
-                    robot.motorBR.power -= easeFun(-speed, EaseMode.EXP)
+                for (hub in robot.allHubs) {
+                    hub.clearBulkCache()
                 }
-            } else {
-                // Not already moving, spin normally
-                if (abs(gamepad1.left_stick_x) > DEADZONE) {
-                    val speed = gamepad1.left_stick_x.toDouble() * MAXTURNSPEED
-                    robot.motorBL.power = easeFun(-speed, EaseMode.EXP) // SQRT works best for turning while moving
-                    robot.motorBR.power = easeFun(speed, EaseMode.EXP)
+
+                when (state) {
+                    DriverControlState.Normal -> {
+                        robot.leftMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
+                        robot.rightMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
+
+                        // Sensitivity clutch with B
+                        targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
+
+                        // Drive with triggers
+                        val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
+                        if (abs(power) > DEADZONE) {
+                            val speed = power.toDouble() * MAXSPEED
+                            robot.leftMotor.power = easeFun(speed)
+                            robot.rightMotor.power = easeFun(speed)
+                        } else {
+                            robot.leftMotor.power = 0.0
+                            robot.rightMotor.power = 0.0
+                        }
+
+                        if (abs(gamepad1.left_stick_x) > DEADZONE) {
+                            val speed = gamepad1.left_stick_x.toDouble() * targetTurnSpeed
+                            robot.leftMotor.power -= easeFun(
+                                speed
+                            ) // SQRT works best for turning while moving
+                            robot.rightMotor.power -= easeFun(-speed)
+                        }
+
+                        // Per Ben H's request, turn with bumpers
+                        if (gamepad1.left_bumper) robot.leftMotor.power = targetTurnSpeed / 2
+                        if (gamepad1.right_bumper) robot.rightMotor.power = targetTurnSpeed / 2
+
+                        // Snap turning with D-Pad
+                        if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                            robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
+                            robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
+                            state = DriverControlState.SnapTurning
+                        } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
+                            robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.leftMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                            robot.rightMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                            state = DriverControlState.SnapTurning
+                        } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
+                            robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                            robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                            state = DriverControlState.SnapTurning
+                        }
+                    }
+
+                    DriverControlState.SnapTurning -> {
+                        if (!robot.leftMotor.isBusy && !robot.rightMotor.isBusy) {
+                            state = DriverControlState.Normal
+                        } else if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                            robot.leftMotor.targetPosition = robot.leftMotor.currentPosition
+                            robot.rightMotor.targetPosition = robot.leftMotor.currentPosition
+                            state = DriverControlState.Normal
+                        }
+                    }
                 }
-                else {
-                    robot.motorBL.power = 0.0
-                    robot.motorBR.power = 0.0
-                }
+
+                // Update previous gamepad state
+                prevGamepad1.copy(gamepad1)
+                prevGamepad2.copy(gamepad2)
+
+                odometry.update(
+                    robot.leftMotor.currentPosition,
+                    robot.rightMotor.currentPosition,
+                    robot.controlHubIMU.angularOrientation.firstAngle
+                )
+
+                //DEBUG: Log movement
+                telemetry.addLine("Motor Position (BL): ${robot.leftMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+                telemetry.addLine("Motor Position (BR): ${robot.rightMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+                telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
+                telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
+                telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
+                telemetry.addLine("left stick: ${gamepad1.left_stick_x}")
+                telemetry.addLine("Ltrigger, Rtrigger = ${gamepad1.left_trigger}, ${gamepad1.right_trigger}")
             }
-
-            // Linear slide motor
-            robot.motorLinearSlide.power = if (gamepad1.left_trigger.toDouble() > 0) {
-                gamepad1.left_trigger.toDouble()
-            } else {
-                -gamepad1.right_trigger.toDouble()
-            }
-
-            // Commented out because it seems we don't need this anymore?
-            //DEBUG: Cycle through easing functions
-            /*val easeVals = enumValues<EaseMode>()
-            easeMode = when {
-                gamepad1.right_bumper -> easeVals[Math.floorMod((easeMode.ordinal + 1), easeVals.size)]
-                gamepad1.left_bumper -> easeVals[Math.floorMod((easeMode.ordinal - 1), easeVals.size)]
-                else -> easeMode
-            }*/
-
-            //DEBUG: Log movement
-            telemetry.addLine("easeMode: $easeMode")
-            telemetry.addLine("Motor Position: ${robot.motorLinearSlide.currentPosition}")
-            telemetry.addLine("left stick: ${gamepad1.left_stick_x}")
-            telemetry.addLine("Ltrigger, Rtrigger = ${gamepad1.left_trigger}, ${gamepad1.right_trigger}")
+            telemetry.addLine("loop time $elapsed")
             telemetry.update()
         }
     }
