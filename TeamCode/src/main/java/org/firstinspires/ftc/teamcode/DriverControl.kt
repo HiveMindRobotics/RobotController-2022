@@ -19,6 +19,9 @@ class DriverControl : LinearOpMode() {
     private fun easeFun(x: Double): Double =
         if (x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
 
+    private fun anyDpad(gamepad: Gamepad): Boolean =
+        gamepad.dpad_down || gamepad.dpad_left /* || gamepad.dpad_up */ || gamepad.dpad_right
+
     override fun runOpMode() {
         // hardwareMap is null until runOpMode() is called
         val robot = Hardware(hardwareMap)
@@ -29,14 +32,11 @@ class DriverControl : LinearOpMode() {
 
         var state = DriverControlState.Normal
 
-
         waitForStart()
 
         var targetTurnSpeed: Double
-
         while (opModeIsActive()) {
             val elapsed = measureTimeMillis {
-
                 for (hub in robot.allHubs) {
                     hub.clearBulkCache()
                 }
@@ -72,25 +72,23 @@ class DriverControl : LinearOpMode() {
                         if (gamepad1.left_bumper) robot.leftMotor.power = targetTurnSpeed / 2
                         if (gamepad1.right_bumper) robot.rightMotor.power = targetTurnSpeed / 2
 
-                        // Snap turning with D-Pad
-                        if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                        // DRY - Don't Repeat Yourself
+                        if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {
                             robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
                             robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-                            robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
-                            robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
                             state = DriverControlState.SnapTurning
-                        } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
-                            robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-                            robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-                            robot.leftMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
-                            robot.rightMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
-                            state = DriverControlState.SnapTurning
-                        } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
-                            robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-                            robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-                            robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
-                            robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
-                            state = DriverControlState.SnapTurning
+
+                            // Snap turning with D-Pad
+                            if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
+                                robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
+                                robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
+                            } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
+                                robot.leftMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.rightMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                            } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
+                                robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                            }
                         }
                     }
 
@@ -124,6 +122,7 @@ class DriverControl : LinearOpMode() {
                 telemetry.addLine("left stick: ${gamepad1.left_stick_x}")
                 telemetry.addLine("Ltrigger, Rtrigger = ${gamepad1.left_trigger}, ${gamepad1.right_trigger}")
             }
+
             telemetry.addLine("loop time $elapsed")
             telemetry.update()
         }
