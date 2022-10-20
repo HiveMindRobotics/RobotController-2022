@@ -43,8 +43,8 @@ class DriverControl : LinearOpMode() {
 
                 when (state) {
                     DriverControlState.Normal -> {
-                        robot.leftMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
-                        robot.rightMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
+                        robot.leftMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+                        robot.rightMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
 
                         // Sensitivity clutch with B
                         targetTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
@@ -80,14 +80,14 @@ class DriverControl : LinearOpMode() {
 
                             // Snap turning with D-Pad
                             if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
-                                robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 2).toInt()
-                                robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 2).toInt()
+                                robot.leftMotor.targetPosition = robot.leftMotor.currentPosition + (Odometry.TICKS_PER_TURN / 2).toInt()
+                                robot.rightMotor.targetPosition = robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 2).toInt()
                             } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
-                                robot.leftMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
-                                robot.rightMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.leftMotor.targetPosition = robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.rightMotor.targetPosition = robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
                             } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
-                                robot.leftMotor.targetPosition += (Odometry.TICKS_PER_TURN / 4).toInt()
-                                robot.rightMotor.targetPosition -= (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.leftMotor.targetPosition = robot.leftMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.rightMotor.targetPosition = robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
                             }
                         }
                     }
@@ -113,9 +113,12 @@ class DriverControl : LinearOpMode() {
                     robot.controlHubIMU.angularOrientation.firstAngle
                 )
 
+
                 //DEBUG: Log movement
                 telemetry.addLine("Motor Position (BL): ${robot.leftMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
                 telemetry.addLine("Motor Position (BR): ${robot.rightMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+                telemetry.addLine("Target Position (BL): ${robot.leftMotor.targetPosition.toFloat()}")
+                telemetry.addLine("Speed (BL): ${robot.leftMotor.power}")
                 telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
                 telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
                 telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
