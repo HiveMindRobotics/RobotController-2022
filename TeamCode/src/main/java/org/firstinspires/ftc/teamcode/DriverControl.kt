@@ -52,7 +52,7 @@ class DriverControl : LinearOpMode() {
                         // Drive with triggers
                         val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
                         if (abs(power) > DEADZONE) {
-                            val speed = power.toDouble() * MAXSPEED
+                            val speed = power.toDouble() * if(!gamepad1.b) MAXSPEED else MAXSPEED / 2
                             robot.leftMotor.power = easeFun(speed)
                             robot.rightMotor.power = easeFun(speed)
                         } else {
