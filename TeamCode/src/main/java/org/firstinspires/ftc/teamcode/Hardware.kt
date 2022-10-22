@@ -10,8 +10,8 @@ import kotlin.properties.Delegates
 
 class Hardware(hwMap: HardwareMap) {
     // add "lateinit" whenever you need to comment something out
-    var leftMotor: DcMotor
-    var rightMotor: DcMotor
+    var leftMotor: DcMotorEx
+    var rightMotor: DcMotorEx
     lateinit var motorFL: DcMotor
     lateinit var motorFR: DcMotor
 
@@ -34,14 +34,16 @@ class Hardware(hwMap: HardwareMap) {
     var allHubs: List<LynxModule>
 
     init {
-        leftMotor = hwMap.get(DcMotor::class.java, "motor0")
+        leftMotor = hwMap.get(DcMotorEx::class.java, "motor0")
         leftMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         leftMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
         leftMotor.direction = DcMotorSimple.Direction.REVERSE
+        leftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-        rightMotor = hwMap.get(DcMotor::class.java, "motor1")
+        rightMotor = hwMap.get(DcMotorEx::class.java, "motor1")
         rightMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         rightMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
+        rightMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
         grabberServo = hwMap.get(Servo::class.java, "servo0")

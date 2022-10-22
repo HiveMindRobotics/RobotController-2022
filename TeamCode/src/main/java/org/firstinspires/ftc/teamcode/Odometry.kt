@@ -18,7 +18,7 @@ class Odometry {
         // This is for the andymark motors
         const val ROTATIONS_PER_TICK: Float = 1 / 537.6f
         const val INCHES_PER_TURN: Float = (9 * PI).toFloat()
-        const val TICKS_PER_TURN = INCHES_PER_TURN * INCHES_PER_ROTATION * ROTATIONS_PER_TICK
+        const val TICKS_PER_TURN = INCHES_PER_TURN / INCHES_PER_ROTATION / ROTATIONS_PER_TICK
     }
 
     // https://gm0.org/en/latest/docs/software/concepts/odometry.html#robot-relative-deltas
