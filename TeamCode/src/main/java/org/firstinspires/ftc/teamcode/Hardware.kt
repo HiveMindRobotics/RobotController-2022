@@ -33,16 +33,18 @@ class Hardware(hwMap: HardwareMap) {
 
     var allHubs: List<LynxModule>
 
+    fun resetCache() {
+        for (hub in allHubs) {
+            hub.clearBulkCache()
+        }
+    }
+
     init {
         leftMotor = hwMap.get(DcMotorEx::class.java, "motor0")
-        leftMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        leftMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
         leftMotor.direction = DcMotorSimple.Direction.REVERSE
         leftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         rightMotor = hwMap.get(DcMotorEx::class.java, "motor1")
-        rightMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        rightMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
         rightMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
