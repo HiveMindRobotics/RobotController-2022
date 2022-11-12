@@ -37,9 +37,8 @@ class DriverControl : LinearOpMode() {
         var targetTurnSpeed: Double
         while (opModeIsActive()) {
             val elapsed = measureTimeMillis {
-                for (hub in robot.allHubs) {
-                    hub.clearBulkCache()
-                }
+
+                robot.resetCache()
 
                 when (state) {
                     DriverControlState.Normal -> {
@@ -85,6 +84,8 @@ class DriverControl : LinearOpMode() {
                         if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {
                             robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
                             robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+                            robot.leftMotor.power = 0.3
+                            robot.rightMotor.power = 0.3
                             state = DriverControlState.SnapTurning
 
                             // Snap turning with D-Pad
