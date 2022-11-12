@@ -28,6 +28,7 @@ dependencies {
     implementation 'com.acmerobotics.roadrunner:core:0.5.5'
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation 'org.openftc:apriltag:1.1.0'
+    implementation files('lib/oasisbot-1.0-SNAPSHOT.jar')
 }
 repositories {
     mavenCentral()
