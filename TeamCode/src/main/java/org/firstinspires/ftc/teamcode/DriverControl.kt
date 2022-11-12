@@ -72,10 +72,7 @@ class DriverControl : LinearOpMode() {
                         if (gamepad1.right_bumper) robot.rightMotor.power = targetTurnSpeed / 2
 
                         // linear slide
-/*
                         robot.motorLinearSlide.power = gamepad1.right_stick_y.toDouble()
-*/
-                        robot.grabberServo.position = gamepad1.right_stick_y.toDouble()
 
                         // Grabber - X to close, Y to open
                         if(gamepad1.x)
