@@ -72,6 +72,8 @@ class AutoTest : LinearOpMode() {
             }
         } while (!isStopRequested && !isStarted && (detections == null || detections.size == 0))
         camera.closeCameraDeviceAsync {}
+        telemetry.addLine("READY!! tagNumber: $tagNumber")
+        telemetry.update()
 
         waitForStart()
 
@@ -142,7 +144,8 @@ class AutoTest : LinearOpMode() {
                                     robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
                             }
                             2 -> {
-                                robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                robot.leftMotor.targetPosition =
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                                 robot.rightMotor.targetPosition =
                                     robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                             }
