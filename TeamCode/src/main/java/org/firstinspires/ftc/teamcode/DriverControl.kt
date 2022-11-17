@@ -79,7 +79,7 @@ class DriverControl : LinearOpMode() {
                             robot.grabberServo.position = 0.0
                         else
                             // change to 0.3 later
-                            robot.grabberServo.position = 1.0
+                            robot.grabberServo.position = 0.3
 
                         // DRY - Don't Repeat Yourself   -- sky
                         if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {
@@ -128,6 +128,7 @@ class DriverControl : LinearOpMode() {
                 //DEBUG: Log movement
                 telemetry.addLine("Motor Position (BL): ${robot.leftMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
                 telemetry.addLine("Motor Position (BR): ${robot.rightMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
+                telemetry.addLine("Motor Position (Slide): ${robot.rightMotor.currentPosition}")
                 telemetry.addLine("Target Position (BL): ${robot.leftMotor.targetPosition.toFloat()}")
                 telemetry.addLine("Speed (BL): ${robot.leftMotor.power}")
                 telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
