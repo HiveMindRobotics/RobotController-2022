@@ -41,11 +41,12 @@ class Hardware(hwMap: HardwareMap) {
 
     init {
         leftMotor = hwMap.get(DcMotorEx::class.java, "motor0")
-        leftMotor.direction = DcMotorSimple.Direction.REVERSE
         leftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         rightMotor = hwMap.get(DcMotorEx::class.java, "motor1")
         rightMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        rightMotor.direction = DcMotorSimple.Direction.REVERSE
+
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
         grabberServo = hwMap.get(Servo::class.java, "servo0")

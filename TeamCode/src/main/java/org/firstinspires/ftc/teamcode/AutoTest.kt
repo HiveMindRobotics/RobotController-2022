@@ -6,8 +6,10 @@ import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline
 import org.firstinspires.ftc.teamcode.DriverControlState
 import org.firstinspires.ftc.teamcode.Hardware
 import org.firstinspires.ftc.teamcode.Odometry
+import org.openftc.apriltag.AprilTagDetection
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraRotation
+import java.util.ArrayList
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.system.measureTimeMillis
@@ -58,113 +60,109 @@ class AutoTest : LinearOpMode() {
             }
         })
 
-        waitForStart()
 
-        val detections = aprilTagDetectionPipeline.getDetectionsUpdate()
-        val tagNumber = detections?.get(0)?.id ?: 1
+        var detections: ArrayList<AprilTagDetection>?
+        var tagNumber = 2
+
+        do {
+            robot.resetCache()
+            detections = aprilTagDetectionPipeline.getDetectionsUpdate()
+            if (detections != null && detections.size != 0) {
+                tagNumber = detections[0].id
+            }
+        } while (!isStopRequested && !isStarted && (detections == null || detections.size == 0))
         camera.closeCameraDeviceAsync {}
+
+        waitForStart()
 
         while (opModeIsActive()) {
 
             robot.resetCache()
-            // this is a BAD AUTO. HORRIBLE STATE MACHINE
-            // however, it was a quick hack.
-
-            //TODO: fix movement numbers and directions!
 
             if (!robot.leftMotor.isBusy && !robot.rightMotor.isBusy) {
-                when (state) {
-                    0 -> {
-                        robot.leftMotor.targetPosition =
-                            robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
-                        robot.rightMotor.targetPosition =
-                            robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
-                        state = 1
-                    }
-
+                when(tagNumber) {
                     1 -> {
-                        when (tagNumber) {
-                            1 -> {
-                                // turn right (doesn't work)
-                                robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
-                                robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
-                            }
-                            2 -> {}
-                            3 -> {
-                                // turn left (doesn't work)
-                                robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
-                                robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
-                            }
-                        }
-                        state = 2
-                    }
-
-                    2 -> {
-                        when (tagNumber) {
-                            1 -> {
+                        when (state) {
+                            0 -> {
                                 robot.leftMotor.targetPosition =
                                     robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
                                 robot.rightMotor.targetPosition =
                                     robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                            }
+                            1 -> {
+                                // turn left
+                                robot.leftMotor.targetPosition =
+                                    robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.rightMotor.targetPosition =
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
                             }
                             2 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                             }
                             3 -> {
+                                // turn right
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
                             }
+                            4 -> {
+                                robot.leftMotor.targetPosition =
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                robot.rightMotor.targetPosition =
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                            }
+                            5 -> {} // intentionally empty
+                            else -> state -= 1 // cancel out the add ahead
                         }
-                        state = 3
+                        state += 1
                     }
-
+                    2 -> {
+                        robot.leftMotor.targetPosition =
+                            robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 36).toInt()
+                        robot.rightMotor.targetPosition =
+                            robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 36).toInt()
+                    }
                     3 -> {
-                        when (tagNumber) {
-                            1 -> {
-                                // turn left (doesn't work)
-                                robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
-                                robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
-                            }
-                            2 -> {}
-                            3 -> {
-                                // turn right (doesn't work)
-                                robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
-                                robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
-                            }
-                        }
-                        state = 4
-                    }
-
-                    4 -> {
-                        when (tagNumber) {
-                            1 -> {
+                        when (state) {
+                            0 -> {
                                 robot.leftMotor.targetPosition =
                                     robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
                                 robot.rightMotor.targetPosition =
                                     robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
                             }
-                            2 -> {}
-                            3 -> {
+                            1 -> {
+                                // turn right
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
                             }
+                            2 -> {
+                                robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                robot.rightMotor.targetPosition =
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                            }
+                            3 -> {
+                                // turn left
+                                robot.leftMotor.targetPosition =
+                                    robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
+                                robot.rightMotor.targetPosition =
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
+                            }
+                            4 -> {
+                                robot.leftMotor.targetPosition =
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                robot.rightMotor.targetPosition =
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                            }
+                            5 -> {} // intentionally empty
+                            else -> state -= 1 // cancel out the add ahead
                         }
-                        state = 5
+                        state += 1
                     }
                 }
             }
