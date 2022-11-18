@@ -64,6 +64,8 @@ class AutoTest : LinearOpMode() {
         var detections: ArrayList<AprilTagDetection>?
         var tagNumber = 2
 
+        telemetry.addLine("initializing...")
+        telemetry.update()
         do {
             robot.resetCache()
             detections = aprilTagDetectionPipeline.getDetectionsUpdate()
