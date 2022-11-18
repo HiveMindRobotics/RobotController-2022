@@ -21,6 +21,7 @@ class Hardware(hwMap: HardwareMap) {
 
     lateinit var motorArm: DcMotor
     lateinit var grabberServo: Servo
+    lateinit var rotateArmServo: Servo
 
     lateinit var distanceSensorFront: DistanceSensor
 
@@ -50,6 +51,7 @@ class Hardware(hwMap: HardwareMap) {
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
         grabberServo = hwMap.get(Servo::class.java, "servo0")
+        rotateArmServo = hwMap.get(Servo::class.java, "servo1")
 
         allHubs = hwMap.getAll(LynxModule::class.java)
 

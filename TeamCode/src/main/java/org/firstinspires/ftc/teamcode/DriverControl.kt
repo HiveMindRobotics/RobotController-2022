@@ -36,6 +36,8 @@ class DriverControl : LinearOpMode() {
 
         waitForStart()
 
+        var toggleGrab = false
+
         var maxTurnSpeed: Double
         var maxMoveSpeed: Double
         while (opModeIsActive()) {
@@ -78,8 +80,11 @@ class DriverControl : LinearOpMode() {
                         // linear slide
                         robot.motorLinearSlide.power = gamepad1.right_stick_y.toDouble()
 
+                        if(gamepad2.x && !prevGamepad2.x)
+                            toggleGrab = !toggleGrab
+
                         // Grabber - X to close, Y to open
-                        if(gamepad1.x)
+                        if(toggleGrab)
                             robot.grabberServo.position = 0.0
                         else
                             // change to 0.3 later
