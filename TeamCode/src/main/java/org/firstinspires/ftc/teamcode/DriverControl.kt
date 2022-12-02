@@ -11,7 +11,7 @@ import kotlin.system.measureTimeMillis
 @TeleOp(name = "Driver Control", group = "Linear Opmode")
 class DriverControl : LinearOpMode() {
     @Config
-    companion object {
+    object M {
         @JvmField var DEADZONE = 0.1
         @JvmField var MAXSPEED = 1.0
         @JvmField var MAXTURNSPEED = 1.0 // Want more precise turning but faster forwards/backwards movement
@@ -51,12 +51,12 @@ class DriverControl : LinearOpMode() {
                         robot.rightMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
 
                         // Sensitivity clutch with B
-                        maxTurnSpeed = if (gamepad1.b) MAXTURNSPEED / 2 else MAXTURNSPEED
-                        maxMoveSpeed = if (gamepad1.b) MAXSPEED / 2 else MAXSPEED
+                        maxTurnSpeed = if (gamepad1.b) M.MAXTURNSPEED / 2 else M.MAXTURNSPEED
+                        maxMoveSpeed = if (gamepad1.b) M.MAXSPEED / 2 else M.MAXSPEED
 
                         // Drive with triggers
                         val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
-                        if (abs(power) > DEADZONE) {
+                        if (abs(power) > M.DEADZONE) {
                             val speed = power.toDouble() * maxMoveSpeed
                             robot.leftMotor.power = easeFun(speed)
                             robot.rightMotor.power = easeFun(speed)
@@ -65,20 +65,28 @@ class DriverControl : LinearOpMode() {
                             robot.rightMotor.power = 0.0
                         }
 
-                        if (abs(gamepad1.left_stick_x) > DEADZONE) {
+                        if (abs(gamepad1.left_stick_x) > M.DEADZONE) {
                             val speed = gamepad1.left_stick_x.toDouble() * maxTurnSpeed
                             robot.leftMotor.power -= easeFun(
-                                speed
+                                -speed
                             ) // SQRT works best for turning while moving
-                            robot.rightMotor.power -= easeFun(-speed)
+                            robot.rightMotor.power -= easeFun(speed)
                         }
 
                         // Per Ben H's request, turn with bumpers
                         if (gamepad1.left_bumper) robot.leftMotor.power = maxTurnSpeed / 2
                         if (gamepad1.right_bumper) robot.rightMotor.power = maxTurnSpeed / 2
 
-                        // linear slide
-                        robot.motorLinearSlide.power = gamepad1.right_stick_y.toDouble()
+                        if (gamepad2.left_stick_y == 0.0f) {
+                            robot.motorLinearSlide.targetPosition = robot.motorLinearSlide.currentPosition
+                            robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_TO_POSITION
+                        } else {
+                            robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER
+                            // linear slide
+                            robot.motorLinearSlide.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
+                        }
+
+                        robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
 
                         if(gamepad2.x && !prevGamepad2.x)
                             toggleGrab = !toggleGrab
@@ -137,10 +145,8 @@ class DriverControl : LinearOpMode() {
                 //DEBUG: Log movement
                 telemetry.addLine("Motor Position (BL): ${robot.leftMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
                 telemetry.addLine("Motor Position (BR): ${robot.rightMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
-                telemetry.addLine("Motor Position (Slide): ${robot.rightMotor.currentPosition}")
-                telemetry.addLine("Target Position (BL): ${robot.leftMotor.targetPosition.toFloat()}")
-                telemetry.addLine("Speed (BL): ${robot.leftMotor.power}")
                 telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
+                telemetry.addLine("Speed (BL): ${robot.leftMotor.power}")
                 telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
                 telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
                 telemetry.addLine("left stick: ${gamepad1.left_stick_x}")

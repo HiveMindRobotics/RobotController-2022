@@ -89,9 +89,9 @@ class AutoTest : LinearOpMode() {
                         when (state) {
                             0 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
                             }
                             1 -> {
                                 // turn left
@@ -102,7 +102,7 @@ class AutoTest : LinearOpMode() {
                             }
                             2 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 218).toInt()
                                 robot.rightMotor.targetPosition =
                                     robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                             }
@@ -115,9 +115,9 @@ class AutoTest : LinearOpMode() {
                             }
                             4 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 18).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 18).toInt()
                             }
                             5 -> {} // intentionally empty
                             else -> state -= 1 // cancel out the add ahead
@@ -125,18 +125,27 @@ class AutoTest : LinearOpMode() {
                         state += 1
                     }
                     2 -> {
-                        robot.leftMotor.targetPosition =
-                            robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 36).toInt()
-                        robot.rightMotor.targetPosition =
-                            robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 36).toInt()
+                        when (state) {
+                        0 -> {
+                            robot.leftMotor.targetPosition =
+                                robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                            robot.rightMotor.targetPosition =
+                                robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                        }
+                            1 -> {
+
+                            }
+                            else -> state -= 1
+                        }
+                        state += 1
                     }
                     3 -> {
                         when (state) {
                             0 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 12).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
                             }
                             1 -> {
                                 // turn right
@@ -160,9 +169,9 @@ class AutoTest : LinearOpMode() {
                             }
                             4 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 18).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 18).toInt()
                             }
                             5 -> {} // intentionally empty
                             else -> state -= 1 // cancel out the add ahead

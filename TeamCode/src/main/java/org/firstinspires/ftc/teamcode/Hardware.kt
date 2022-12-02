@@ -20,8 +20,8 @@ class Hardware(hwMap: HardwareMap) {
     lateinit var motorDucks: DcMotor
 
     lateinit var motorArm: DcMotor
-    lateinit var grabberServo: Servo
-    lateinit var rotateArmServo: Servo
+    var grabberServo: Servo
+    var rotateArmServo: CRServo
 
     lateinit var distanceSensorFront: DistanceSensor
 
@@ -50,8 +50,12 @@ class Hardware(hwMap: HardwareMap) {
 
 
         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
+        motorLinearSlide.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        motorLinearSlide.targetPosition = 0
+        motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER
+
         grabberServo = hwMap.get(Servo::class.java, "servo0")
-        rotateArmServo = hwMap.get(Servo::class.java, "servo1")
+        rotateArmServo = hwMap.get(CRServo::class.java, "servo1")
 
         allHubs = hwMap.getAll(LynxModule::class.java)
 
