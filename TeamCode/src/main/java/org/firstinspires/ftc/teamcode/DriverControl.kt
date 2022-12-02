@@ -91,14 +91,13 @@ class DriverControl : LinearOpMode() {
 
                         robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
 
+                        // Grabber - X to toggle open and close
                         if(gamepad2.x && !prevGamepad2.x)
                             toggleGrab = !toggleGrab
 
-                        // Grabber - X to close, Y to open
                         if(toggleGrab)
                             robot.grabberServo.position = 0.0
                         else
-                            // change to 0.3 later
                             robot.grabberServo.position = 0.3
 
                         // DRY - Don't Repeat Yourself   -- sky
