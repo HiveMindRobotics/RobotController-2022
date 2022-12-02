@@ -15,6 +15,9 @@ class DriverControl : LinearOpMode() {
         @JvmField var DEADZONE = 0.1
         @JvmField var MAXSPEED = 1.0
         @JvmField var MAXTURNSPEED = 1.0 // Want more precise turning but faster forwards/backwards movement
+        @JvmField var ROTATEAMOUNT = 0.2
+        @JvmField var MAXHEIGHT = 2117
+        @JvmField var MAXSLIDESPEED = 0.5
         // 1 is temporary - just to test
     }
 
