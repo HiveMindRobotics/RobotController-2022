@@ -1,5 +1,3 @@
-package org.firstinspires.ftc.teamcode.subsystems
-
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
@@ -25,7 +23,12 @@ class TwoWheelTank(hwMap: HardwareMap) {
 
     }
 
-    fun moveByInches() {
-
+    /**
+     * move the robot forward by a certain number of inches
+     * @param inches number of inches to move, (-infinity, infinity)
+     */
+    fun moveByInches(inches: Int) = runToPositionMode {
+        rightMotor.targetPosition = rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * inches).toInt()
+        leftMotor.targetPosition = leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * inches).toInt()
     }
 }
