@@ -20,6 +20,7 @@ class LinearSlide(hwMap: HardwareMap) {
 
     @Config
     object LinearSlideConstants {
+        // TODO: figure out constants LMAO
         @JvmField var FIRST_STAGE_TICKS = 0
         @JvmField var SECOND_STAGE_TICKS = 0
         @JvmField var THIRD_STAGE_TICKS = 0
