@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
-import com.qualcomm.robotcore.hardware.CRServo
+//import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
 
 class Grabber(hwMap: HardwareMap) {
     private val grabberServo: Servo
-    private val rotateArmServo: CRServo
+    private val rotateArmServo: Servo
 
     /**
      * open or close the grabber
@@ -27,11 +27,12 @@ class Grabber(hwMap: HardwareMap) {
      */
     var grabberRaised = false
         set(value) {
+            rotateArmServo.position = if (value) 0.0 else 0.0
             field = value
         }
 
     init {
         grabberServo = hwMap.get(Servo::class.java, "servo0")
-        rotateArmServo = hwMap.get(CRServo::class.java, "servo1")
+        rotateArmServo = hwMap.get(Servo::class.java, "servo1")
     }
 }
