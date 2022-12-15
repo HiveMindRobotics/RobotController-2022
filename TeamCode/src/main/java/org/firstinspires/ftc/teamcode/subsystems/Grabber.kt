@@ -14,10 +14,7 @@ class Grabber(hwMap: HardwareMap) {
      */
     var grabberClosed = false
         set(value) {
-            if (value)
-                grabberServo.position = 0.3
-            else
-                grabberServo.position = 0.0
+            grabberServo.position = if (value) 0.3 else 0.0
             field = value
         }
 
