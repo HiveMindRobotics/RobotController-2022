@@ -1,3 +1,5 @@
+package org.firstinspires.ftc.teamcode.drive
+
 import com.acmerobotics.dashboard.config.Config
 import com.acmerobotics.roadrunner.control.PIDCoefficients
 import com.acmerobotics.roadrunner.drive.TankDrive
@@ -7,7 +9,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.acmerobotics.roadrunner.trajectory.constraints.*
-import com.qualcomm.hardware.bosch.BNO055IMU
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.robotcore.hardware.*
@@ -34,7 +35,7 @@ class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, Dri
     private val motors: List<DcMotorEx>
     private val leftMotors: List<DcMotorEx>
     private val rightMotors: List<DcMotorEx>
-    private val imu: BNO055IMU
+    private val imu: IMU
     private val batteryVoltageSensor: VoltageSensor
 
     init {
@@ -49,10 +50,10 @@ class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, Dri
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU::class.java, "imu0")
+        imu = hardwareMap.get(IMU::class.java, "imu")
         // TODO: Adjust the orientations here to match your robot. See the FTC SDK documentation for
         // details
-        val parameters: BNO055IMU.Parameters = BNO055IMU.Parameters(
+        val parameters = IMU.Parameters(
             RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
@@ -189,12 +190,12 @@ class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, Dri
                     + OMEGA_WEIGHT * Math.abs(drivePower.heading))
             Pose2d(
                 VX_WEIGHT * drivePower.x,
-                0,
+                0.0,
                 OMEGA_WEIGHT * drivePower.heading
             ).div(denom)
         } else {
             // Ensure the y axis is zeroed out.
-            Pose2d(drivePower.x, 0, drivePower.heading)
+            Pose2d(drivePower.x, 0.0, drivePower.heading)
         }
         setDrivePower(vel)
     }
@@ -233,16 +234,16 @@ class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, Dri
     }
 
     override val rawExternalHeading: Double
-        get() = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
+        get() = imu.robotYawPitchRollAngles.getYaw(AngleUnit.RADIANS)
 
     override fun getExternalHeadingVelocity(): Double? {
-        return imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate
+        return imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate.toDouble()
     }
 
     companion object {
-        var AXIAL_PID = PIDCoefficients(0, 0, 0)
-        var CROSS_TRACK_PID = PIDCoefficients(0, 0, 0)
-        var HEADING_PID = PIDCoefficients(0, 0, 0)
+        var AXIAL_PID = PIDCoefficients(0.0, 0.0, 0.0)
+        var CROSS_TRACK_PID = PIDCoefficients(0.0, 0.0, 0.0)
+        var HEADING_PID = PIDCoefficients(0.0, 0.0, 0.0)
         var VX_WEIGHT = 1.0
         var OMEGA_WEIGHT = 1.0
         private val VEL_CONSTRAINT =
