@@ -1,0 +1,260 @@
+Index: TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Hardware.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.firstinspires.ftc.teamcode\n\nimport com.qualcomm.hardware.bosch.BNO055IMU\nimport com.qualcomm.hardware.lynx.LynxModule\nimport com.qualcomm.robotcore.hardware.*\nimport org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName\nimport org.openftc.easyopencv.OpenCvCamera\nimport org.openftc.easyopencv.OpenCvCameraFactory\nimport kotlin.properties.Delegates\n\nclass Hardware(hwMap: HardwareMap) {\n    // add \"lateinit\" whenever you need to comment something out\n    var leftMotor: DcMotorEx\n    var rightMotor: DcMotorEx\n    lateinit var motorFL: DcMotor\n    lateinit var motorFR: DcMotor\n\n    var motorLinearSlide: DcMotorEx\n\n    lateinit var motorDucks: DcMotor\n\n    lateinit var motorArm: DcMotor\n    var grabberServo: Servo\n    var rotateArmServo: CRServo\n\n    lateinit var distanceSensorFront: DistanceSensor\n\n    var cameraMonitorViewId by Delegates.notNull<Int>()\n    var openCvCamera: OpenCvCamera\n    var webcamName: WebcamName\n\n    var controlHubIMU: BNO055IMU\n    lateinit var expansionHubIMU: BNO055IMU\n\n    var allHubs: List<LynxModule>\n\n    fun resetCache() {\n        for (hub in allHubs) {\n            hub.clearBulkCache()\n        }\n    }\n\n    init {\n        leftMotor = hwMap.get(DcMotorEx::class.java, \"motor0\")\n        leftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE\n\n        rightMotor = hwMap.get(DcMotorEx::class.java, \"motor1\")\n        rightMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE\n        rightMotor.direction = DcMotorSimple.Direction.REVERSE\n\n\n        motorLinearSlide = hwMap.get(DcMotorEx::class.java, \"motor2\")\n        motorLinearSlide.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER\n        motorLinearSlide.targetPosition = 0\n        motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER\n\n        grabberServo = hwMap.get(Servo::class.java, \"servo0\")\n        rotateArmServo = hwMap.get(CRServo::class.java, \"servo1\")\n\n        allHubs = hwMap.getAll(LynxModule::class.java)\n\n        // WARNING!!!! you MUST reset the cache after every cycle!!!!!!!!!\n        for (hub in allHubs) {\n            hub.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL\n        }\n\n        /*\n        motorFL = hwMap.get(DcMotor::class.java, \"motor3\")\n        motorFR = hwMap.get(DcMotor::class.java, \"motor2\")\n\n        motorDucks = hwMap.get(DcMotor::class.java, \"motor4\")\n\n        motorArm = hwMap.get(DcMotor::class.java, \"motor5\")\n        motorArm?.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER\n\n        servoArm = hwMap.get(Servo::class.java, \"servo0\")\n\n        distanceSensorFront = hwMap.get(DistanceSensor::class.java, \"distance0\")\n\n        webcamName = hwMap.get(WebcamName::class.java, \"camera0\")*/\n\n/*        cameraMonitorViewId = hwMap?.appContext?.resources?.getIdentifier(\n            \"cameraMonitorViewId\",\n            \"id\",\n            hwMap.appContext?.packageName\n        )!!*/\n\n/*        openCvCamera = OpenCvCameraFactory.getInstance()\n            .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK)*/\n        webcamName = hwMap.get(WebcamName::class.java, \"camera0\")\n        openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName)\n\n        controlHubIMU = hwMap.get(BNO055IMU::class.java, \"imu0\")\n        val imuParams = BNO055IMU.Parameters()\n        imuParams.angleUnit = BNO055IMU.AngleUnit.RADIANS\n        controlHubIMU.initialize(imuParams)\n/*\n        expansionHubIMU = hwMap.get(BNO055IMU::class.java, \"imu0\")\n\n        val parameters = BNO055IMU.Parameters()\n        parameters.mode                = BNO055IMU.SensorMode.IMU\n        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES\n        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC\n        parameters.accelerationIntegrationAlgorithm = JustLoggingAccelerationIntegrator()\n        parameters.loggingEnabled      = false\n        controlHubIMU?.initialize(parameters)\n        expansionHubIMU?.initialize(parameters)*/\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Hardware.kt b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Hardware.kt
+--- a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Hardware.kt	(revision 7ac52a1bfe56db80bacd20697d80f00bb7cc3da7)
++++ b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Hardware.kt	(date 1671135749603)
+@@ -10,10 +10,10 @@
+ 
+ class Hardware(hwMap: HardwareMap) {
+     // add "lateinit" whenever you need to comment something out
+-    var leftMotor: DcMotorEx
+-    var rightMotor: DcMotorEx
+-    lateinit var motorFL: DcMotor
+-    lateinit var motorFR: DcMotor
++    var motorFL: DcMotorEx
++    var motorFR: DcMotorEx
++    var motorBL: DcMotorEx
++    var motorBR: DcMotorEx
+ 
+     var motorLinearSlide: DcMotorEx
+ 
+@@ -41,12 +41,23 @@
+     }
+ 
+     init {
+-        leftMotor = hwMap.get(DcMotorEx::class.java, "motor0")
++        /*leftMotor = hwMap.get(DcMotorEx::class.java, "motor0")
+         leftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+ 
+         rightMotor = hwMap.get(DcMotorEx::class.java, "motor1")
+         rightMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+-        rightMotor.direction = DcMotorSimple.Direction.REVERSE
++        rightMotor.direction = DcMotorSimple.Direction.REVERSE*/
++
++        motorFL = hwMap.get(DcMotorEx::class.java, "motor0")
++        motorFR = hwMap.get(DcMotorEx::class.java, "motor1")
++        motorBL = hwMap.get(DcMotorEx::class.java, "motor2")
++        motorBR = hwMap.get(DcMotorEx::class.java, "motor3")
++        motorFL.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
++        motorFR.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
++        motorBL.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
++        motorBR.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
++
++
+ 
+ 
+         motorLinearSlide = hwMap.get(DcMotorEx::class.java, "motor2")
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"CompilerConfiguration\">\n    <bytecodeTargetLevel target=\"11\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision 7ac52a1bfe56db80bacd20697d80f00bb7cc3da7)
++++ b/.idea/compiler.xml	(date 1671135219442)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="CompilerConfiguration">
+-    <bytecodeTargetLevel target="11" />
++    <bytecodeTargetLevel target="17" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"DesignSurface\">\n    <option name=\"filePathToZoomLevelMap\">\n      <map>\n        <entry key=\"FtcRobotController/src/main/res/layout/activity_ftc_controller.xml\" value=\"0.3795289855072464\" />\n      </map>\n    </option>\n  </component>\n  <component name=\"EntryPointsManager\">\n    <list size=\"1\">\n      <item index=\"0\" class=\"java.lang.String\" itemvalue=\"com.qualcomm.robotcore.eventloop.opmode.TeleOp\" />\n    </list>\n  </component>\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"FrameworkDetectionExcludesConfiguration\">\n    <file type=\"web\" url=\"file://$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_11\" default=\"true\" project-jdk-name=\"corretto-11\" project-jdk-type=\"JavaSDK\" />\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 7ac52a1bfe56db80bacd20697d80f00bb7cc3da7)
++++ b/.idea/misc.xml	(date 1671135219420)
+@@ -16,5 +16,5 @@
+   <component name="FrameworkDetectionExcludesConfiguration">
+     <file type="web" url="file://$PROJECT_DIR$" />
+   </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="corretto-11" project-jdk-type="JavaSDK" />
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_17_PREVIEW" project-jdk-name="corretto-17" project-jdk-type="JavaSDK" />
+ </project>
+\ No newline at end of file
+Index: TeamCode/src/main/java/org/firstinspires/ftc/teamcode/DriverControl4WD.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/DriverControl4WD.kt b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/DriverControl4WD.kt
+new file mode 100644
+--- /dev/null	(date 1671134835509)
++++ b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/DriverControl4WD.kt	(date 1671134835509)
+@@ -0,0 +1,162 @@
++package org.firstinspires.ftc.teamcode
++
++import com.acmerobotics.dashboard.config.Config
++import com.qualcomm.robotcore.eventloop.opmode.TeleOp
++import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
++import com.qualcomm.robotcore.hardware.DcMotor
++import com.qualcomm.robotcore.hardware.Gamepad
++import kotlin.math.*
++import kotlin.system.measureTimeMillis
++
++@TeleOp(name = "Driver Control", group = "Linear Opmode")
++class DriverControl : LinearOpMode() {
++    @Config
++    object M {
++        @JvmField var DEADZONE = 0.1
++        @JvmField var MAXSPEED = 0.8
++        @JvmField var MAXTURNSPEED = 0.8 // Want more precise turning but faster forwards/backwards movement
++        @JvmField var ROTATEAMOUNT = 0.2
++        @JvmField var MAXHEIGHT = 2117
++        @JvmField var MAXSLIDESPEED = 0.5
++        // 1 is temporary - just to test
++    }
++
++    private fun easeFun(x: Double): Double =
++        if (x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
++
++    private fun anyDpad(gamepad: Gamepad): Boolean =
++        gamepad.dpad_down || gamepad.dpad_left /* || gamepad.dpad_up */ || gamepad.dpad_right
++
++    override fun runOpMode() {
++        // hardwareMap is null until runOpMode() is called
++        val robot = Hardware(hardwareMap)
++        val odometry = Odometry()
++
++        val prevGamepad1 = Gamepad()
++        val prevGamepad2 = Gamepad()
++
++        var state = DriverControlState.Normal
++
++        waitForStart()
++
++        var toggleGrab = false
++
++        var maxTurnSpeed: Double
++        var maxMoveSpeed: Double
++        while (opModeIsActive()) {
++            val elapsed = measureTimeMillis {
++
++                robot.resetCache()
++
++                when (state) {
++                    DriverControlState.Normal -> {
++                        robot.leftMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
++                        robot.rightMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
++
++                        // Sensitivity clutch with B
++                        maxTurnSpeed = if (gamepad1.b) M.MAXTURNSPEED / 2 else M.MAXTURNSPEED
++                        maxMoveSpeed = if (gamepad1.b) M.MAXSPEED / 2 else M.MAXSPEED
++
++                        // Drive with triggers
++                        val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
++                        if (abs(power) > M.DEADZONE) {
++                            val speed = power.toDouble() * maxMoveSpeed
++                            robot.leftMotor.power = easeFun(speed)
++                            robot.rightMotor.power = easeFun(speed)
++                        } else {
++                            robot.leftMotor.power = 0.0
++                            robot.rightMotor.power = 0.0
++                        }
++
++                        if (abs(gamepad1.left_stick_x) > M.DEADZONE) {
++                            val speed = gamepad1.left_stick_x.toDouble() * maxTurnSpeed
++                            robot.leftMotor.power -= easeFun(
++                                -speed
++                            ) // SQRT works best for turning while moving
++                            robot.rightMotor.power -= easeFun(speed)
++                        }
++
++                        // Per Ben H's request, turn with bumpers
++                        if (gamepad1.left_bumper) robot.leftMotor.power = maxTurnSpeed / 2
++                        if (gamepad1.right_bumper) robot.rightMotor.power = maxTurnSpeed / 2
++
++                        if (gamepad2.left_stick_y == 0.0f) {
++                            robot.motorLinearSlide.targetPosition = robot.motorLinearSlide.currentPosition
++                            robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_TO_POSITION
++                        } else {
++                            robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER
++                            // linear slide
++                            robot.motorLinearSlide.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
++                        }
++
++                        robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
++
++                        // Grabber - X to toggle open and close
++                        if(gamepad2.x && !prevGamepad2.x)
++                            toggleGrab = !toggleGrab
++
++                        if(toggleGrab)
++                            robot.grabberServo.position = 0.0
++                        else
++                            robot.grabberServo.position = 0.3
++
++                        // DRY - Don't Repeat Yourself   -- sky
++                        if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {
++                            robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
++                            robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
++                            robot.leftMotor.power = 0.3
++                            robot.rightMotor.power = 0.3
++                            state = DriverControlState.SnapTurning
++
++                            // Snap turning with D-Pad
++                            if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
++                                robot.leftMotor.targetPosition = robot.leftMotor.currentPosition + (Odometry.TICKS_PER_TURN / 2).toInt()
++                                robot.rightMotor.targetPosition = robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 2).toInt()
++                            } else if (gamepad1.dpad_left && !prevGamepad1.dpad_left) {
++                                robot.leftMotor.targetPosition = robot.leftMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
++                                robot.rightMotor.targetPosition = robot.rightMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
++                            } else if (gamepad1.dpad_right && !prevGamepad1.dpad_right) {
++                                robot.leftMotor.targetPosition = robot.leftMotor.currentPosition + (Odometry.TICKS_PER_TURN / 4).toInt()
++                                robot.rightMotor.targetPosition = robot.rightMotor.currentPosition - (Odometry.TICKS_PER_TURN / 4).toInt()
++                            }
++                        }
++                    }
++
++                    DriverControlState.SnapTurning -> {
++                        if (!robot.leftMotor.isBusy && !robot.rightMotor.isBusy) {
++                            state = DriverControlState.Normal
++                        } else if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
++                            robot.leftMotor.targetPosition = robot.leftMotor.currentPosition
++                            robot.rightMotor.targetPosition = robot.leftMotor.currentPosition
++                            state = DriverControlState.Normal
++                        }
++                    }
++                }
++
++                // Update previous gamepad state
++                prevGamepad1.copy(gamepad1)
++                prevGamepad2.copy(gamepad2)
++
++                odometry.update(
++                    robot.leftMotor.currentPosition,
++                    robot.rightMotor.currentPosition,
++                    robot.controlHubIMU.angularOrientation.firstAngle
++                )
++
++
++                //DEBUG: Log movement
++                telemetry.addLine("Motor Position (BL): ${robot.leftMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
++                telemetry.addLine("Motor Position (BR): ${robot.rightMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
++                telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
++                telemetry.addLine("Speed (BL): ${robot.leftMotor.power}")
++                telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
++                telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
++                telemetry.addLine("left stick: ${gamepad1.left_stick_x}")
++                telemetry.addLine("Ltrigger, Rtrigger = ${gamepad1.left_trigger}, ${gamepad1.right_trigger}")
++            }
++
++            telemetry.addLine("loop time $elapsed")
++            telemetry.update()
++        }
++    }
++}

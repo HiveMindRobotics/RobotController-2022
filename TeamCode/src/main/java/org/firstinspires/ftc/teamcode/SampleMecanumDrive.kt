@@ -1,10 +1,7 @@
-package org.firstinspires.ftc.teamcode.drive
-
 import com.acmerobotics.dashboard.config.Config
 import com.acmerobotics.roadrunner.control.PIDCoefficients
-import com.acmerobotics.roadrunner.drive.DriveSignal
-import com.acmerobotics.roadrunner.drive.MecanumDrive
-import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower
+import com.acmerobotics.roadrunner.drive.TankDrive
+import com.acmerobotics.roadrunner.followers.TankPIDVAFollower
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
@@ -12,17 +9,12 @@ import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.acmerobotics.roadrunner.trajectory.constraints.*
 import com.qualcomm.hardware.bosch.BNO055IMU
 import com.qualcomm.hardware.lynx.LynxModule
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior
-import org.firstinspires.ftc.teamcode.DriveConstants.MAX_ACCEL
-import org.firstinspires.ftc.teamcode.DriveConstants.MAX_ANG_ACCEL
-import org.firstinspires.ftc.teamcode.DriveConstants.MAX_ANG_VEL
-import org.firstinspires.ftc.teamcode.DriveConstants.MAX_VEL
-import org.firstinspires.ftc.teamcode.DriveConstants.MOTOR_VELO_PID
-import org.firstinspires.ftc.teamcode.DriveConstants.RUN_USING_ENCODER
-import org.firstinspires.ftc.teamcode.DriveConstants.TRACK_WIDTH
-import org.firstinspires.ftc.teamcode.DriveConstants.encoderTicksToInches
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.teamcode.DriveConstants
 import org.firstinspires.ftc.teamcode.DriveConstants.kA
 import org.firstinspires.ftc.teamcode.DriveConstants.kStatic
 import org.firstinspires.ftc.teamcode.DriveConstants.kV
@@ -33,24 +25,21 @@ import org.firstinspires.ftc.teamcode.util.LynxModuleUtil
 import java.util.*
 
 /*
-* Simple mecanum drive hardware implementation for REV hardware.
+* Simple tank drive hardware implementation for REV hardware.
 */
 @Config
-class SampleMecanumDrive(hardwareMap: HardwareMap) :
-    MecanumDrive(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER) {
+class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, DriveConstants.TRACK_WIDTH) {
     private val trajectorySequenceRunner: TrajectorySequenceRunner
     private val follower: TrajectoryFollower
-    private val leftFront: DcMotorEx
-    private val leftRear: DcMotorEx
-    private val rightRear: DcMotorEx
-    private val rightFront: DcMotorEx
     private val motors: List<DcMotorEx>
+    private val leftMotors: List<DcMotorEx>
+    private val rightMotors: List<DcMotorEx>
     private val imu: BNO055IMU
     private val batteryVoltageSensor: VoltageSensor
 
     init {
-        follower = HolonomicPIDVAFollower(
-            TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
+        follower = TankPIDVAFollower(
+            AXIAL_PID, CROSS_TRACK_PID,
             Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5
         )
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap)
@@ -60,48 +49,36 @@ class SampleMecanumDrive(hardwareMap: HardwareMap) :
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU::class.java, "imu")
-        val parameters = BNO055IMU.Parameters()
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS
+        imu = hardwareMap.get(BNO055IMU::class.java, "imu0")
+        // TODO: Adjust the orientations here to match your robot. See the FTC SDK documentation for
+        // details
+        val parameters: BNO055IMU.Parameters = BNO055IMU.Parameters(
+            RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+            )
+        )
         imu.initialize(parameters)
 
-        // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
-        // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
-        //
-        //             | +Z axis
-        //             |
-        //             |
-        //             |
-        //      _______|_____________     +Y axis
-        //     /       |_____________/|__________
-        //    /   REV / EXPANSION   //
-        //   /       / HUB         //
-        //  /_______/_____________//
-        // |_______/_____________|/
-        //        /
-        //       / +X axis
-        //
-        // This diagram is derived from the axes in section 3.4 https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bno055-ds000.pdf
-        // and the placement of the dot/orientation from https://docs.revrobotics.com/rev-control-system/control-system-overview/dimensions#imu-location
-        //
-        // For example, if +Y in this diagram faces downwards, you would use AxisDirection.NEG_Y.
-        // BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Y);
-        leftFront = hardwareMap.get(DcMotorEx::class.java, "leftFront")
-        leftRear = hardwareMap.get(DcMotorEx::class.java, "leftRear")
-        rightRear = hardwareMap.get(DcMotorEx::class.java, "rightRear")
-        rightFront = hardwareMap.get(DcMotorEx::class.java, "rightFront")
+        // add/remove motors depending on your robot (e.g., 6WD)
+        val leftFront = hardwareMap.get(DcMotorEx::class.java, "leftFront")
+        val leftRear = hardwareMap.get(DcMotorEx::class.java, "leftRear")
+        val rightRear = hardwareMap.get(DcMotorEx::class.java, "rightRear")
+        val rightFront = hardwareMap.get(DcMotorEx::class.java, "rightFront")
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront)
+        leftMotors = Arrays.asList(leftFront, leftRear)
+        rightMotors = Arrays.asList(rightFront, rightRear)
         for (motor in motors) {
             val motorConfigurationType = motor.motorType.clone()
             motorConfigurationType.achieveableMaxRPMFraction = 1.0
             motor.motorType = motorConfigurationType
         }
-        if (RUN_USING_ENCODER) {
+        if (DriveConstants.RUN_USING_ENCODER) {
             setMode(RunMode.RUN_USING_ENCODER)
         }
         setZeroPowerBehavior(ZeroPowerBehavior.BRAKE)
-        if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
-            setPIDFCoefficients(RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID)
+        if (DriveConstants.RUN_USING_ENCODER && DriveConstants.MOTOR_VELO_PID != null) {
+            setPIDFCoefficients(RunMode.RUN_USING_ENCODER, DriveConstants.MOTOR_VELO_PID)
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
@@ -111,19 +88,23 @@ class SampleMecanumDrive(hardwareMap: HardwareMap) :
         trajectorySequenceRunner = TrajectorySequenceRunner(follower, HEADING_PID)
     }
 
+    fun trajectoryBuilder(startPose: Pose2d?): TrajectoryBuilder {
+        return TrajectoryBuilder(startPose, VEL_CONSTRAINT, accelConstraint)
+    }
+
     fun trajectoryBuilder(startPose: Pose2d?, reversed: Boolean): TrajectoryBuilder {
-        return TrajectoryBuilder(startPose!!, reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+        return TrajectoryBuilder(startPose!!, reversed, VEL_CONSTRAINT, accelConstraint)
     }
 
     fun trajectoryBuilder(startPose: Pose2d?, startHeading: Double): TrajectoryBuilder {
-        return TrajectoryBuilder(startPose!!, startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+        return TrajectoryBuilder(startPose!!, startHeading, VEL_CONSTRAINT, accelConstraint)
     }
 
     fun trajectorySequenceBuilder(startPose: Pose2d?): TrajectorySequenceBuilder {
         return TrajectorySequenceBuilder(
             startPose,
-            VEL_CONSTRAINT, ACCEL_CONSTRAINT,
-            MAX_ANG_VEL, MAX_ANG_ACCEL
+            VEL_CONSTRAINT, accelConstraint,
+            DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL
         )
     }
 
@@ -163,12 +144,12 @@ class SampleMecanumDrive(hardwareMap: HardwareMap) :
     }
 
     val lastError: Pose2d
-        get() = trajectorySequenceRunner.getLastPoseError()
+        get() = trajectorySequenceRunner.lastPoseError
 
     fun update() {
         updatePoseEstimate()
-        val signal: DriveSignal = trajectorySequenceRunner.update(poseEstimate, poseVelocity)!!
-        if (signal != null) setDriveSignal(signal)
+        val signal = trajectorySequenceRunner.update(poseEstimate, poseVelocity)
+        signal?.let { setDriveSignal(it) }
     }
 
     fun waitForIdle() {
@@ -176,7 +157,7 @@ class SampleMecanumDrive(hardwareMap: HardwareMap) :
     }
 
     val isBusy: Boolean
-        get() = trajectorySequenceRunner.isBusy()
+        get() = trajectorySequenceRunner.isBusy
 
     fun setMode(runMode: RunMode?) {
         for (motor in motors) {
@@ -202,62 +183,71 @@ class SampleMecanumDrive(hardwareMap: HardwareMap) :
 
     fun setWeightedDrivePower(drivePower: Pose2d) {
         var vel = drivePower
-        if ((Math.abs(drivePower.x) + Math.abs(drivePower.y)
-                    + Math.abs(drivePower.heading)) > 1
-        ) {
+        vel = if (Math.abs(drivePower.x) + Math.abs(drivePower.heading) > 1) {
             // re-normalize the powers according to the weights
-            val denom =
-                VX_WEIGHT * Math.abs(drivePower.x) + VY_WEIGHT * Math.abs(drivePower.y) + OMEGA_WEIGHT * Math.abs(
-                    drivePower.heading
-                )
-            vel = Pose2d(
+            val denom = (VX_WEIGHT * Math.abs(drivePower.x)
+                    + OMEGA_WEIGHT * Math.abs(drivePower.heading))
+            Pose2d(
                 VX_WEIGHT * drivePower.x,
-                VY_WEIGHT * drivePower.y,
+                0,
                 OMEGA_WEIGHT * drivePower.heading
             ).div(denom)
+        } else {
+            // Ensure the y axis is zeroed out.
+            Pose2d(drivePower.x, 0, drivePower.heading)
         }
         setDrivePower(vel)
     }
 
     override fun getWheelPositions(): List<Double> {
-        val wheelPositions: MutableList<Double> = ArrayList()
-        for (motor in motors) {
-            wheelPositions.add(encoderTicksToInches(motor.currentPosition.toDouble()))
+        var leftSum = 0.0
+        var rightSum = 0.0
+        for (leftMotor in leftMotors) {
+            leftSum += DriveConstants.encoderTicksToInches(leftMotor.currentPosition.toDouble())
         }
-        return wheelPositions
+        for (rightMotor in rightMotors) {
+            rightSum += DriveConstants.encoderTicksToInches(rightMotor.currentPosition.toDouble())
+        }
+        return Arrays.asList(leftSum / leftMotors.size, rightSum / rightMotors.size)
     }
 
     override fun getWheelVelocities(): List<Double>? {
-        val wheelVelocities: MutableList<Double> = ArrayList()
-        for (motor in motors) {
-            wheelVelocities.add(encoderTicksToInches(motor.velocity))
+        var leftSum = 0.0
+        var rightSum = 0.0
+        for (leftMotor in leftMotors) {
+            leftSum += DriveConstants.encoderTicksToInches(leftMotor.velocity)
         }
-        return wheelVelocities
+        for (rightMotor in rightMotors) {
+            rightSum += DriveConstants.encoderTicksToInches(rightMotor.velocity)
+        }
+        return Arrays.asList(leftSum / leftMotors.size, rightSum / rightMotors.size)
     }
 
-    override fun setMotorPowers(v: Double, v1: Double, v2: Double, v3: Double) {
-        leftFront.power = v
-        leftRear.power = v1
-        rightRear.power = v2
-        rightFront.power = v3
+    override fun setMotorPowers(v: Double, v1: Double) {
+        for (leftMotor in leftMotors) {
+            leftMotor.power = v
+        }
+        for (rightMotor in rightMotors) {
+            rightMotor.power = v1
+        }
     }
 
     override val rawExternalHeading: Double
-        get() = imu.angularOrientation.firstAngle.toDouble()
+        get() = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
 
     override fun getExternalHeadingVelocity(): Double? {
-        return imu.angularVelocity.zRotationRate.toDouble()
+        return imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate
     }
 
     companion object {
-        var TRANSLATIONAL_PID = PIDCoefficients(0.0, 0.0, 0.0)
-        var HEADING_PID = PIDCoefficients(0.0, 0.0, 0.0)
-        var LATERAL_MULTIPLIER = 1.0
+        var AXIAL_PID = PIDCoefficients(0, 0, 0)
+        var CROSS_TRACK_PID = PIDCoefficients(0, 0, 0)
+        var HEADING_PID = PIDCoefficients(0, 0, 0)
         var VX_WEIGHT = 1.0
-        var VY_WEIGHT = 1.0
         var OMEGA_WEIGHT = 1.0
-        private val VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH)
-        private val ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL)
+        private val VEL_CONSTRAINT =
+            getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH)
+        private val accelConstraint = getAccelerationConstraint(DriveConstants.MAX_ACCEL)
         fun getVelocityConstraint(
             maxVel: Double,
             maxAngularVel: Double,
@@ -266,7 +256,7 @@ class SampleMecanumDrive(hardwareMap: HardwareMap) :
             return MinVelocityConstraint(
                 Arrays.asList(
                     AngularVelocityConstraint(maxAngularVel),
-                    MecanumVelocityConstraint(maxVel, trackWidth)
+                    TankVelocityConstraint(maxVel, trackWidth)
                 )
             )
         }
