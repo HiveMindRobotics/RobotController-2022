@@ -45,13 +45,13 @@ class AutoMovement(private val robot: Hardware, private val opMode: LinearOpMode
 
     fun getDistance() : Double = round(robot.distanceSensorFront.getDistance(DistanceUnit.CM))
 
-    fun armGrab() {
+/*    fun armGrab() {
         robot.grabberServo.position = 0.0
     }
 
     fun armRelease() {
         robot.grabberServo.position = 1.0
-    }
+    }*/
 
     fun ducksStart(speed: Double) {
         robot.motorDucks.power = speed

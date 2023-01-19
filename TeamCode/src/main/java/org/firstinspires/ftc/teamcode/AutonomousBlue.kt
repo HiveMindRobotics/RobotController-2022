@@ -25,7 +25,9 @@ class AutonomousBlue : LinearOpMode() {
         auto.armRelease()
         auto.moveToDistance(5.0, 0.2)
         */
+/*
         auto.armGrab()
+*/
 
         waitForStart()
         /*auto.ducksStart(-1.0)

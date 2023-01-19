@@ -50,6 +50,7 @@ class DriverControl : LinearOpMode() {
 
                 when (state) {
                     DriverControlState.Normal -> {
+
                         robot.leftMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
                         robot.rightMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
 
@@ -83,10 +84,15 @@ class DriverControl : LinearOpMode() {
                         if (gamepad2.left_stick_y == 0.0f) {
                             robot.motorLinearSlide.targetPosition = robot.motorLinearSlide.currentPosition
                             robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_TO_POSITION
+
+                            robot.motorLinearSlide2.targetPosition = robot.motorLinearSlide2.currentPosition
+                            robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_TO_POSITION
                         } else {
                             robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER
-                            // linear slide
                             robot.motorLinearSlide.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
+
+                            robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_USING_ENCODER
+                            robot.motorLinearSlide2.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
                         }
 
                         robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
@@ -95,10 +101,14 @@ class DriverControl : LinearOpMode() {
                         if(gamepad2.x && !prevGamepad2.x)
                             toggleGrab = !toggleGrab
 
-                        if(toggleGrab)
+
+/*                        if(toggleGrab)
                             robot.grabberServo.position = 0.0
                         else
-                            robot.grabberServo.position = 0.3
+                            robot.grabberServo.position = 0.3*/
+
+                        robot.grabberServo.power = gamepad1.left_stick_y.toDouble()
+                        robot.rotateArmServo.power = gamepad1.right_stick_y.toDouble()
 
                         // DRY - Don't Repeat Yourself   -- sky
                         if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {

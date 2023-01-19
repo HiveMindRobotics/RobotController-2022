@@ -13,7 +13,9 @@ class AutonomousRed : LinearOpMode() {
 
     override fun runOpMode() {
 
+/*
         auto.armGrab()
+*/
 
         waitForStart()
         /*
