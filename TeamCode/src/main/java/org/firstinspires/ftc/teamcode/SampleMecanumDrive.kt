@@ -88,7 +88,7 @@ class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, Dri
     }
 
     fun trajectoryBuilder(startPose: Pose2d?): TrajectoryBuilder {
-        return TrajectoryBuilder(startPose, VEL_CONSTRAINT, accelConstraint)
+        return TrajectoryBuilder(startPose!!, startPose.heading, VEL_CONSTRAINT, accelConstraint)
     }
 
     fun trajectoryBuilder(startPose: Pose2d?, reversed: Boolean): TrajectoryBuilder {
