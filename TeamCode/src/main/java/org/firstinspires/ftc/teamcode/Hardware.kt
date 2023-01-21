@@ -8,33 +8,33 @@ import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
 import kotlin.properties.Delegates
 
-class Hardware(hwMap: HardwareMap) {
+object Hardware {
     // add "lateinit" whenever you need to comment something out
-    var leftMotor: DcMotorEx
-    var rightMotor: DcMotorEx
+    lateinit var leftMotor: DcMotorEx
+    lateinit var rightMotor: DcMotorEx
     lateinit var motorFL: DcMotor
     lateinit var motorFR: DcMotor
 
-    var motorLinearSlide: DcMotorEx
-    var motorLinearSlide2: DcMotorEx
+    lateinit var motorLinearSlide: DcMotorEx
+    lateinit var motorLinearSlide2: DcMotorEx
 
 
     lateinit var motorDucks: DcMotor
 
     lateinit var motorArm: DcMotor
-    var grabberServo: CRServo
-    var rotateArmServo: CRServo
+    lateinit var grabberServo: Servo
+    lateinit var rotateArmServo: Servo
 
     lateinit var distanceSensorFront: DistanceSensor
 
     var cameraMonitorViewId by Delegates.notNull<Int>()
-    var openCvCamera: OpenCvCamera
-    var webcamName: WebcamName
+    lateinit var openCvCamera: OpenCvCamera
+    lateinit var webcamName: WebcamName
 
-    var controlHubIMU: BNO055IMU
+    lateinit var controlHubIMU: BNO055IMU
     lateinit var expansionHubIMU: BNO055IMU
 
-    var allHubs: List<LynxModule>
+    lateinit var allHubs: List<LynxModule>
 
     fun resetCache() {
         for (hub in allHubs) {
@@ -42,7 +42,7 @@ class Hardware(hwMap: HardwareMap) {
         }
     }
 
-    init {
+    fun init(hwMap: HardwareMap) {
         leftMotor = hwMap.get(DcMotorEx::class.java, "motor0")
         leftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
@@ -62,8 +62,8 @@ class Hardware(hwMap: HardwareMap) {
         motorLinearSlide2.mode = DcMotor.RunMode.RUN_USING_ENCODER
         motorLinearSlide2.direction = DcMotorSimple.Direction.REVERSE
 
-        grabberServo = hwMap.get(CRServo::class.java, "servo0")
-        rotateArmServo = hwMap.get(CRServo::class.java, "servo1")
+        grabberServo = hwMap.get(Servo::class.java, "servo0")
+        rotateArmServo = hwMap.get(Servo::class.java, "servo1")
 
         allHubs = hwMap.getAll(LynxModule::class.java)
 

@@ -15,7 +15,10 @@ class VuforiaTest : LinearOpMode() {
     private var targets: VuforiaTrackables? = null
     private var targetVisible = false
     override fun runOpMode() {
-        val robot = Hardware(hardwareMap)
+
+        // TODO FIX THIS
+        Hardware.init(hardwareMap)
+        val robot = Hardware
 
         for (hub in robot.allHubs) {
             hub.clearBulkCache()

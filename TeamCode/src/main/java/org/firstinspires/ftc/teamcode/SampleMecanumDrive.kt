@@ -62,13 +62,11 @@ class SampleTankDrive(hardwareMap: HardwareMap) : TankDrive(kV, kA, kStatic, Dri
         imu.initialize(parameters)
 
         // add/remove motors depending on your robot (e.g., 6WD)
-        val leftFront = hardwareMap.get(DcMotorEx::class.java, "leftFront")
-        val leftRear = hardwareMap.get(DcMotorEx::class.java, "leftRear")
-        val rightRear = hardwareMap.get(DcMotorEx::class.java, "rightRear")
-        val rightFront = hardwareMap.get(DcMotorEx::class.java, "rightFront")
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront)
-        leftMotors = Arrays.asList(leftFront, leftRear)
-        rightMotors = Arrays.asList(rightFront, rightRear)
+        val left = hardwareMap.get(DcMotorEx::class.java, "motor0")
+        val right = hardwareMap.get(DcMotorEx::class.java, "motor1")
+        motors = Arrays.asList(left, right)
+        leftMotors = Arrays.asList(left)
+        rightMotors = Arrays.asList(right)
         for (motor in motors) {
             val motorConfigurationType = motor.motorType.clone()
             motorConfigurationType.achieveableMaxRPMFraction = 1.0

@@ -31,7 +31,9 @@ class AutoTest : LinearOpMode() {
         var tagsize = 0.0249
 
         // hardwareMap is null until runOpMode() is called
-        val robot = Hardware(hardwareMap)
+        // TODO FIX THIS HACK
+        Hardware.init(hardwareMap)
+        val robot = Hardware
         val odometry = Odometry()
 
         var state = 0

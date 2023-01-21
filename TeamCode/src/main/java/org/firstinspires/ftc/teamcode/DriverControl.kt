@@ -28,8 +28,12 @@ class DriverControl : LinearOpMode() {
         gamepad.dpad_down || gamepad.dpad_left /* || gamepad.dpad_up */ || gamepad.dpad_right
 
     override fun runOpMode() {
+        // TODO FIX THIS ENTIRE THING
         // hardwareMap is null until runOpMode() is called
-        val robot = Hardware(hardwareMap)
+        Hardware.init(hardwareMap)
+
+        // TODO FIX THIS HACK
+        val robot = Hardware
         val odometry = Odometry()
 
         val prevGamepad1 = Gamepad()
@@ -95,7 +99,8 @@ class DriverControl : LinearOpMode() {
                             robot.motorLinearSlide2.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
                         }
 
-                        robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
+                        // TODO FIX THIS
+                        // robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
 
                         // Grabber - X to toggle open and close
                         if(gamepad2.x && !prevGamepad2.x)
@@ -107,8 +112,9 @@ class DriverControl : LinearOpMode() {
                         else
                             robot.grabberServo.position = 0.3*/
 
-                        robot.grabberServo.power = gamepad1.left_stick_y.toDouble()
-                        robot.rotateArmServo.power = gamepad1.right_stick_y.toDouble()
+                        // TODO FIX THESE
+                        /* robot.grabberServo.power = gamepad1.left_stick_y.toDouble()
+                        robot.rotateArmServo.power = gamepad1.right_stick_y.toDouble() */
 
                         // DRY - Don't Repeat Yourself   -- sky
                         if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {
