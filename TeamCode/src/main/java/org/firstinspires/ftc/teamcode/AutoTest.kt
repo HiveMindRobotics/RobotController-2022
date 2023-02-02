@@ -102,7 +102,7 @@ class AutoTest : LinearOpMode() {
                             }
                             2 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 218).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                                 robot.rightMotor.targetPosition =
                                     robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 24).toInt()
                             }

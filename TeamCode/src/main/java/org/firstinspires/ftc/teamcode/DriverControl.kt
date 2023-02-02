@@ -22,7 +22,7 @@ class DriverControl : LinearOpMode() {
     }
 
     private fun easeFun(x: Double): Double =
-        if (x > 0) (0.857 * x + 0.1).pow(1.58) else -((0.857 * -x + 0.1).pow(1.58))
+        if (x > 0) x.pow(2.0) else -x.pow(2.0)
 
     private fun anyDpad(gamepad: Gamepad): Boolean =
         gamepad.dpad_down || gamepad.dpad_left /* || gamepad.dpad_up */ || gamepad.dpad_right
@@ -81,7 +81,7 @@ class DriverControl : LinearOpMode() {
                         if (gamepad1.left_bumper) robot.leftMotor.power = maxTurnSpeed / 2
                         if (gamepad1.right_bumper) robot.rightMotor.power = maxTurnSpeed / 2
 
-                        if (gamepad2.left_stick_y == 0.0f) {
+                        if (gamepad2.right_trigger == 0.0f && gamepad2.left_trigger == 0.0f) {
                             robot.motorLinearSlide.targetPosition = robot.motorLinearSlide.currentPosition
                             robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_TO_POSITION
 
@@ -89,13 +89,11 @@ class DriverControl : LinearOpMode() {
                             robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_TO_POSITION
                         } else {
                             robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER
-                            robot.motorLinearSlide.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
+                            robot.motorLinearSlide.power = M.MAXSLIDESPEED * (-gamepad2.left_trigger + gamepad2.right_trigger)
 
                             robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_USING_ENCODER
-                            robot.motorLinearSlide2.power = M.MAXSLIDESPEED * -gamepad2.left_stick_y
+                            robot.motorLinearSlide2.power = M.MAXSLIDESPEED * (-gamepad2.left_trigger + gamepad2.right_trigger)
                         }
-
-                        robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
 
                         // Grabber - X to toggle open and close
                         if(gamepad2.x && !prevGamepad2.x)
@@ -107,8 +105,8 @@ class DriverControl : LinearOpMode() {
                         else
                             robot.grabberServo.position = 0.3*/
 
-                        robot.grabberServo.power = gamepad1.left_stick_y.toDouble()
-                        robot.rotateArmServo.power = gamepad1.right_stick_y.toDouble()
+                        robot.grabberServo.power = gamepad2.left_stick_y.toDouble()
+                        robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
 
                         // DRY - Don't Repeat Yourself   -- sky
                         if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.acmerobotics.dashboard.config.Config
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -12,14 +13,21 @@ class Odometry {
     var prevX = 0
     var prevHeading: Float = 0.0f;
 
+    @Config
+    object Odo {
+        @JvmField var TRACKWIDTH = 10.0;
+    }
+
     companion object {
         // this is for the 90mm grippy wheels
-        const val INCHES_PER_ROTATION: Float = (PI * /* diameter: cm */ 9 / 2.54 /* cm to inches */).toFloat()
+        val INCHES_PER_ROTATION: Float = (PI * /* diameter: cm */ 9 / 2.54 /* cm to inches */).toFloat()
         // This is for the andymark motors
-        const val ROTATIONS_PER_TICK: Float = 1 / 537.6f
-        const val INCHES_PER_TURN: Float = (11 * PI).toFloat()
-        const val TICKS_PER_TURN = INCHES_PER_TURN / INCHES_PER_ROTATION / ROTATIONS_PER_TICK
-        const val TICKS_PER_INCH = 1 / (INCHES_PER_ROTATION * ROTATIONS_PER_TICK)
+        val ROTATIONS_PER_TICK: Float = 1 / 537.6f
+        val INCHES_PER_TURN: Float
+            get() = (Odo.TRACKWIDTH * PI).toFloat()
+        val TICKS_PER_TURN: Float
+            get() = INCHES_PER_TURN / INCHES_PER_ROTATION / ROTATIONS_PER_TICK
+        val TICKS_PER_INCH = 1 / (INCHES_PER_ROTATION * ROTATIONS_PER_TICK)
             /*
             * inches   rotations
             * ------ * ------

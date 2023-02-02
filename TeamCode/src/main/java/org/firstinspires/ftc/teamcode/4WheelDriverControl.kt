@@ -7,13 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.*
 
-@TeleOp(name = "Driver Control", group = "Linear Opmode")
+@TeleOp(name = "4 Wheel Driver Control", group = "Linear Opmode")
 class `4WheelDriverControl` : LinearOpMode() {
     @Config
     object `4M` {
         @JvmField var DEADZONE = 0.1
-        @JvmField var MAXSPEED = 0.8
-        @JvmField var MAXTURNSPEED = 0.8 // Want more precise turning but faster forwards/backwards movement
+        @JvmField var MAXSPEED = 0.7
+        @JvmField var MAXTURNSPEED = 0.5 // Want more precise turning but faster forwards/backwards movement
         @JvmField var ROTATEAMOUNT = 0.2
         @JvmField var MAXHEIGHT = 2117
         @JvmField var MAXSLIDESPEED = 0.5
