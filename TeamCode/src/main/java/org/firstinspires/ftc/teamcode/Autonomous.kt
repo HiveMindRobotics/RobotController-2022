@@ -1,21 +1,16 @@
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.Gamepad
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline
-import org.firstinspires.ftc.teamcode.DriverControlState
 import org.firstinspires.ftc.teamcode.Hardware
 import org.firstinspires.ftc.teamcode.Odometry
 import org.openftc.apriltag.AprilTagDetection
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraRotation
 import java.util.ArrayList
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.system.measureTimeMillis
 
 @Autonomous
-class AutoTest : LinearOpMode() {
+class Autonomous : LinearOpMode() {
 
     override fun runOpMode() {
         // Lens intrinsics
@@ -36,6 +31,8 @@ class AutoTest : LinearOpMode() {
 
         var state = 0
 
+        robot.grabberServo.position = 0.35
+
         robot.leftMotor.targetPosition = robot.leftMotor.currentPosition
         robot.rightMotor.targetPosition = robot.rightMotor.currentPosition
         robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
@@ -51,7 +48,6 @@ class AutoTest : LinearOpMode() {
 
         camera.openCameraDeviceAsync(object : OpenCvCamera.AsyncCameraOpenListener {
             override fun onOpened() {
-                // TODO: the resolution will need to be changed for the webcam
                 camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT)
             }
 
@@ -89,9 +85,9 @@ class AutoTest : LinearOpMode() {
                         when (state) {
                             0 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 3).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 3).toInt()
                             }
                             1 -> {
                                 // turn left
@@ -143,9 +139,9 @@ class AutoTest : LinearOpMode() {
                         when (state) {
                             0 -> {
                                 robot.leftMotor.targetPosition =
-                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
+                                    robot.leftMotor.currentPosition + (Odometry.TICKS_PER_INCH * 3).toInt()
                                 robot.rightMotor.targetPosition =
-                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 6).toInt()
+                                    robot.rightMotor.currentPosition + (Odometry.TICKS_PER_INCH * 3).toInt()
                             }
                             1 -> {
                                 // turn right
@@ -189,11 +185,6 @@ class AutoTest : LinearOpMode() {
 
             telemetry.update()
 
-            odometry.update(
-                robot.leftMotor.currentPosition,
-                robot.rightMotor.currentPosition,
-                robot.controlHubIMU.angularOrientation.firstAngle
-            )
         }
     }
 }

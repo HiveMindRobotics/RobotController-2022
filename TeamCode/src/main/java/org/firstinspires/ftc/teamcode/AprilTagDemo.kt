@@ -31,7 +31,6 @@ class AprilTagDemo : LinearOpMode() {
 
         camera.openCameraDeviceAsync(object : AsyncCameraOpenListener {
             override fun onOpened() {
-                // TODO: the resolution will need to be changed for the webcam
                 camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT)
             }
 

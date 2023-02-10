@@ -15,7 +15,7 @@ class Odometry {
 
     @Config
     object Odo {
-        @JvmField var TRACKWIDTH = 10.0;
+        @JvmField var TRACKWIDTH = 10.75;
     }
 
     companion object {

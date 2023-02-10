@@ -36,6 +36,7 @@ class DriverControl : LinearOpMode() {
         val prevGamepad2 = Gamepad()
 
         var state = DriverControlState.Normal
+        var currentPos = 0.0
 
         waitForStart()
 
@@ -55,8 +56,8 @@ class DriverControl : LinearOpMode() {
                         robot.rightMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
 
                         // Sensitivity clutch with B
-                        maxTurnSpeed = if (gamepad1.b) M.MAXTURNSPEED / 2 else M.MAXTURNSPEED
-                        maxMoveSpeed = if (gamepad1.b) M.MAXSPEED / 2 else M.MAXSPEED
+                        maxTurnSpeed = if (gamepad1.b) M.MAXTURNSPEED else M.MAXTURNSPEED * 0.7
+                        maxMoveSpeed = if (gamepad1.b) M.MAXSPEED else M.MAXSPEED * 0.7
 
                         // Drive with triggers
                         val power = gamepad1.right_trigger - gamepad1.left_trigger // Gives a "braking" effect
@@ -81,35 +82,32 @@ class DriverControl : LinearOpMode() {
                         if (gamepad1.left_bumper) robot.leftMotor.power = maxTurnSpeed / 2
                         if (gamepad1.right_bumper) robot.rightMotor.power = maxTurnSpeed / 2
 
-                        if (gamepad2.right_trigger == 0.0f && gamepad2.left_trigger == 0.0f) {
+                        /*if (gamepad2.right_trigger == 0.0f && gamepad2.left_trigger == 0.0f) {
                             robot.motorLinearSlide.targetPosition = robot.motorLinearSlide.currentPosition
                             robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_TO_POSITION
 
                             robot.motorLinearSlide2.targetPosition = robot.motorLinearSlide2.currentPosition
                             robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_TO_POSITION
                         } else {
-                            robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER
-                            robot.motorLinearSlide.power = M.MAXSLIDESPEED * (-gamepad2.left_trigger + gamepad2.right_trigger)
+                            robot.motorLinearSlide.mode = DcMotor.RunMode.RUN_USING_ENCODER*/
+                            robot.motorLinearSlide.power = M.MAXSLIDESPEED * (-gamepad2.right_stick_y.toDouble())
 
-                            robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_USING_ENCODER
-                            robot.motorLinearSlide2.power = M.MAXSLIDESPEED * (-gamepad2.left_trigger + gamepad2.right_trigger)
-                        }
+                            // robot.motorLinearSlide2.mode = DcMotor.RunMode.RUN_USING_ENCODER
+                            robot.motorLinearSlide2.power = M.MAXSLIDESPEED * (-gamepad2.right_stick_y.toDouble())
+                        // }
 
                         // Grabber - X to toggle open and close
-                        if(gamepad2.x && !prevGamepad2.x)
+                        if(gamepad2.right_bumper && !prevGamepad2.right_bumper)
                             toggleGrab = !toggleGrab
 
+                        //robot.grabberServo.power = gamepad2.left_stick_y.toDouble()
+                        robot.grabberServo.position = if (toggleGrab) 0.35 else 0.15
+                        robot.rotateArmServo.power = easeFun(gamepad2.left_stick_y.toDouble())
 
-/*                        if(toggleGrab)
-                            robot.grabberServo.position = 0.0
-                        else
-                            robot.grabberServo.position = 0.3*/
-
-                        robot.grabberServo.power = gamepad2.left_stick_y.toDouble()
-                        robot.rotateArmServo.power = gamepad2.right_stick_y.toDouble()
-
-                        // DRY - Don't Repeat Yourself   -- sky
+                        // snap turning
                         if(anyDpad(gamepad1) && !anyDpad(prevGamepad1)) {
+                            robot.leftMotor.targetPosition = robot.leftMotor.currentPosition
+                            robot.rightMotor.targetPosition = robot.rightMotor.currentPosition
                             robot.leftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
                             robot.rightMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
                             robot.leftMotor.power = 0.3
@@ -135,7 +133,7 @@ class DriverControl : LinearOpMode() {
                             state = DriverControlState.Normal
                         } else if (gamepad1.dpad_down && !prevGamepad1.dpad_down) {
                             robot.leftMotor.targetPosition = robot.leftMotor.currentPosition
-                            robot.rightMotor.targetPosition = robot.leftMotor.currentPosition
+                            robot.rightMotor.targetPosition = robot.rightMotor.currentPosition
                             state = DriverControlState.Normal
                         }
                     }
@@ -153,14 +151,7 @@ class DriverControl : LinearOpMode() {
 
 
                 //DEBUG: Log movement
-                telemetry.addLine("Motor Position (BL): ${robot.leftMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
-                telemetry.addLine("Motor Position (BR): ${robot.rightMotor.currentPosition.toFloat() * Odometry.ROTATIONS_PER_TICK}")
-                telemetry.addLine("Motor Position (Slide): ${robot.motorLinearSlide.currentPosition}")
-                telemetry.addLine("Speed (BL): ${robot.leftMotor.power}")
-                telemetry.addLine("Robot Yaw: ${robot.controlHubIMU.angularOrientation.firstAngle}")
-                telemetry.addLine("Pos: ${odometry.x}, ${odometry.y}")
-                telemetry.addLine("left stick: ${gamepad1.left_stick_x}")
-                telemetry.addLine("Ltrigger, Rtrigger = ${gamepad1.left_trigger}, ${gamepad1.right_trigger}")
+                telemetry.addLine("Servo: ${robot.grabberServo.position}")
             }
 
             telemetry.addLine("loop time $elapsed")

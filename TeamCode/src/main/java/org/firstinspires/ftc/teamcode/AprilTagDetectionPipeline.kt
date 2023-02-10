@@ -56,13 +56,10 @@ class AprilTagDetectionPipeline(
     }
 
     override fun processFrame(input: Mat): Mat {
-        // Convert to greyscale
         Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY)
 
-        // set a static decimation. it really doesn't matter how fast our detection is
         AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, 2f)
 
-        // Run AprilTag
         detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagSize, fx, fy, cx, cy)
         synchronized(detectionsUpdateSync) { detectionsUpdate = detections }
 
